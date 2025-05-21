@@ -116,6 +116,27 @@
             outline: none; /* Remove default outline */
         }
 
+        /* Checkbox styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0; /* Override default label margin */
+            font-size: 1em;
+            color: #34495e;
+        }
+
         /* Display area for results */
         .display-area {
             margin-top: 25px;
@@ -194,20 +215,35 @@
 </head>
 <body>
     <div class="container">
-        <h1>币安alpha交易额计数器</h1> <div class="account-selector" id="account-buttons-container">
-            </div>
-        <button id="add-account-btn">添加新账户</button> <div class="input-group">
-            <label for="account-name-input">当前账户名称:</label> <input type="text" id="account-name-input" placeholder="输入账户名称"> </div>
+        <h1>币安alpha交易额计数器</h1>
+        <div class="account-selector" id="account-buttons-container">
+        </div>
+        <button id="add-account-btn">添加新账户</button>
 
         <div class="input-group">
-            <label for="transaction-amount">请输入每次交易数量:</label> <input type="number" id="transaction-amount" placeholder="例如: 100" value="0" min="0"> </div>
+            <label for="account-name-input">当前账户名称:</label>
+            <input type="text" id="account-name-input" placeholder="输入账户名称">
+        </div>
+
+        <div class="input-group">
+            <label for="transaction-amount">请输入每次交易数量:</label>
+            <input type="number" id="transaction-amount" placeholder="例如: 100" value="0" min="0">
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="double-transaction-checkbox">
+            <label for="double-transaction-checkbox">双倍交易额</label>
+        </div>
 
         <div class="display-area">
-            <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight"></span></p> <p><strong>交易笔数:</strong> <span id="transaction-count" class="highlight">0</span></p> <p><strong>总交易额:</strong> <span id="total-transaction-value" class="highlight">0.00</span></p> </div>
+            <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight"></span></p>
+            <p><strong>交易笔数:</strong> <span id="transaction-count" class="highlight">0</span></p>
+            <p><strong>总交易额:</strong> <span id="total-transaction-value" class="highlight">0.00</span></p>
+        </div>
 
         <p class="instructions">
             按 <kbd>上</kbd> 键增加交易笔数，按 <kbd>下</kbd> 键减少交易笔数。
-            </p>
+        </p>
     </div>
 
     <script>
@@ -216,12 +252,13 @@
         const addAccountBtn = document.getElementById('add-account-btn');
         const accountNameInput = document.getElementById('account-name-input');
         const transactionAmountInput = document.getElementById('transaction-amount');
+        const doubleTransactionCheckbox = document.getElementById('double-transaction-checkbox'); // New DOM element
         const transactionCountDisplay = document.getElementById('transaction-count');
         const totalTransactionValueDisplay = document.getElementById('total-transaction-value');
         const currentAccountDisplay = document.getElementById('current-account-display');
 
         // Data structure to store all accounts
-        // Each account object has an id, name, transactionCount, and transactionAmount.
+        // Each account object has an id, name, transactionCount, transactionAmount, and doubleTransaction.
         let accounts = [];
         // The ID of the currently active account
         let currentAccountId = null;
@@ -243,8 +280,8 @@
                     } else {
                         // Fallback if accounts array is not valid
                         accounts = [
-                            { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
-                            { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                            { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
+                            { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
                         ];
                     }
                     currentAccountId = parsedState.currentAccountId || (accounts.length > 0 ? accounts[0].id : null);
@@ -255,14 +292,16 @@
                         if (typeof account.transactionCount === 'undefined') account.transactionCount = 0;
                         if (typeof account.transactionAmount === 'undefined') account.transactionAmount = 0;
                         if (typeof account.name === 'undefined') account.name = `账户 ${parseInt(account.id.split('_')[1]) + 1}`;
+                        // Initialize new 'doubleTransaction' property if it doesn't exist
+                        if (typeof account.doubleTransaction === 'undefined') account.doubleTransaction = false;
                     });
 
                 } catch (e) {
                     console.error("Error parsing saved state from localStorage:", e);
                     // If parsing fails, reset to default accounts state
                     accounts = [
-                        { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
-                        { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                        { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
+                        { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
                     ];
                     currentAccountId = 'account_0';
                     nextAccountId = 2;
@@ -270,8 +309,8 @@
             } else {
                 // If no saved state, initialize with two default accounts
                 accounts = [
-                    { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
-                    { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                    { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
+                    { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
                 ];
                 currentAccountId = 'account_0';
                 nextAccountId = 2;
@@ -312,7 +351,8 @@
 
         /**
          * Updates the displayed values on the webpage based on the current account's data.
-         * Also updates the account name input field and transaction amount input field.
+         * Also updates the account name input field, transaction amount input field,
+         * and the double transaction checkbox.
          */
         function updateDisplay() {
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
@@ -334,12 +374,21 @@
             // Update transaction count display
             transactionCountDisplay.textContent = currentAccountData.transactionCount;
 
+            // Determine the effective transaction amount based on the 'doubleTransaction' setting
+            let effectiveTransactionAmount = currentAccountData.transactionAmount;
+            if (currentAccountData.doubleTransaction) {
+                effectiveTransactionAmount *= 2;
+            }
+
             // Calculate and update total transaction value, formatted to two decimal places
-            const totalValue = currentAccountData.transactionCount * currentAccountData.transactionAmount;
+            const totalValue = currentAccountData.transactionCount * effectiveTransactionAmount;
             totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
 
             // Update the transaction amount input field with the current account's value
             transactionAmountInput.value = currentAccountData.transactionAmount;
+
+            // Update the state of the double transaction checkbox
+            doubleTransactionCheckbox.checked = currentAccountData.doubleTransaction;
 
             // Save the updated state to localStorage
             saveState();
@@ -372,7 +421,8 @@
                 id: newAccountId,
                 name: `新账户 ${nextAccountId}`, // Default name for new account
                 transactionCount: 0,
-                transactionAmount: 0
+                transactionAmount: 0,
+                doubleTransaction: false // Initialize new accounts with doubleTransaction off
             };
             accounts.push(newAccount);
             renderAccountButtons(); // Re-render all buttons to include the new one
@@ -406,6 +456,15 @@
             if (currentAccountData) {
                 currentAccountData.transactionAmount = amount;
                 updateDisplay(); // Update the display to reflect the new amount
+            }
+        });
+
+        // New event listener for the double transaction checkbox
+        doubleTransactionCheckbox.addEventListener('change', (event) => {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccountData) {
+                currentAccountData.doubleTransaction = event.target.checked;
+                updateDisplay(); // Recalculate and update display based on new setting
             }
         });
 
