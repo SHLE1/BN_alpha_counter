@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Counter</title>
+    <style>
+        /* Basic styling for the body */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f2f5; /* Light grey background */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        /* Container for the entire application */
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px; /* Rounded corners for the container */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            text-align: center;
+            width: 100%;
+            max-width: 600px; /* Increased max width */
+            box-sizing: border-box;
+        }
+
+        /* Headings styling */
+        h1 {
+            color: #2c3e50; /* Dark blue-grey for main heading */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        /* Account selector buttons container */
+        .account-selector {
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap; /* Allow buttons to wrap to next line */
+            justify-content: center;
+            gap: 10px; /* Space between buttons */
+        }
+
+        /* Styling for account buttons */
+        .account-selector button {
+            background-color: #3498db; /* Blue for inactive buttons */
+            color: white;
+            border: none;
+            padding: 10px 20px; /* Slightly smaller padding */
+            border-radius: 8px; /* Rounded corners for buttons */
+            cursor: pointer;
+            font-size: 1em; /* Slightly smaller font size */
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transitions */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap; /* Prevent button text from wrapping */
+        }
+
+        .account-selector button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        .account-selector button.active {
+            background-color: #27ae60; /* Green for active button */
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); /* Stronger shadow for active */
+            transform: translateY(0); /* No lift for active */
+        }
+
+        /* Add Account button styling */
+        #add-account-btn {
+            background-color: #f39c12; /* Orange for add button */
+            margin-left: 10px;
+            padding: 10px 20px;
+        }
+
+        #add-account-btn:hover {
+            background-color: #e67e22; /* Darker orange on hover */
+        }
+
+        /* Input group styling */
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e; /* Darker text for labels */
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        .input-group input[type="number"],
+        .input-group input[type="text"] {
+            padding: 12px;
+            border: 1px solid #bdc3c7; /* Light grey border */
+            border-radius: 8px; /* Rounded corners for input */
+            width: calc(100% - 24px); /* Full width minus padding */
+            font-size: 1.1em;
+            color: #34495e;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #3498db; /* Blue border on focus */
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); /* Soft shadow on focus */
+            outline: none; /* Remove default outline */
+        }
+
+        /* Display area for results */
+        .display-area {
+            margin-top: 25px;
+            border-top: 1px solid #ecf0f1; /* Light border at the top */
+            padding-top: 25px;
+        }
+
+        .display-area p {
+            font-size: 1.4em;
+            color: #34495e;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between; /* Space out label and value */
+            align-items: center;
+        }
+
+        .display-area p strong {
+            font-weight: 600;
+            margin-right: 10px; /* Space between label and value */
+        }
+
+        /* Highlighted text for values */
+        .highlight {
+            font-weight: bold;
+            color: #e74c3c; /* Red for emphasis */
+            font-size: 1.5em; /* Larger font for values */
+            flex-grow: 1; /* Allow value to take up remaining space */
+            text-align: right; /* Align value to the right */
+        }
+
+        /* Instructions text */
+        .instructions {
+            margin-top: 30px;
+            font-size: 0.95em;
+            color: #7f8c8d; /* Grey for instructions */
+            line-height: 1.5;
+        }
+
+        /* Keyboard key styling */
+        kbd {
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            padding: 3px 7px;
+            border: 1px solid #bdc3c7;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #34495e;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .account-selector button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            #add-account-btn {
+                margin-top: 10px; /* Add margin for smaller screens */
+                margin-left: 0;
+                width: 100%; /* Full width for add button */
+            }
+            .display-area p {
+                font-size: 1.2em;
+            }
+            .highlight {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>币安alpha交易额计数器</h1> <div class="account-selector" id="account-buttons-container">
+            </div>
+        <button id="add-account-btn">添加新账户</button> <div class="input-group">
+            <label for="account-name-input">当前账户名称:</label> <input type="text" id="account-name-input" placeholder="输入账户名称"> </div>
+
+        <div class="input-group">
+            <label for="transaction-amount">请输入每次交易数量:</label> <input type="number" id="transaction-amount" placeholder="例如: 100" value="0" min="0"> </div>
+
+        <div class="display-area">
+            <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight"></span></p> <p><strong>交易笔数:</strong> <span id="transaction-count" class="highlight">0</span></p> <p><strong>总交易额:</strong> <span id="total-transaction-value" class="highlight">0.00</span></p> </div>
+
+        <p class="instructions">
+            按 <kbd>上</kbd> 键增加交易笔数，按 <kbd>下</kbd> 键减少交易笔数。
+            </p>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const accountButtonsContainer = document.getElementById('account-buttons-container');
+        const addAccountBtn = document.getElementById('add-account-btn');
+        const accountNameInput = document.getElementById('account-name-input');
+        const transactionAmountInput = document.getElementById('transaction-amount');
+        const transactionCountDisplay = document.getElementById('transaction-count');
+        const totalTransactionValueDisplay = document.getElementById('total-transaction-value');
+        const currentAccountDisplay = document.getElementById('current-account-display');
+
+        // Data structure to store all accounts
+        // Each account object has an id, name, transactionCount, and transactionAmount.
+        let accounts = [];
+        // The ID of the currently active account
+        let currentAccountId = null;
+        // Counter for generating unique IDs for new accounts
+        let nextAccountId = 0;
+
+        /**
+         * Loads the saved state from localStorage.
+         * If a state exists, it parses it and updates the 'accounts' array,
+         * 'currentAccountId', and 'nextAccountId'.
+         */
+        function loadState() {
+            const savedState = localStorage.getItem('transactionCounterState');
+            if (savedState) {
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    if (parsedState.accounts && Array.isArray(parsedState.accounts)) {
+                        accounts = parsedState.accounts;
+                    } else {
+                        // Fallback if accounts array is not valid
+                        accounts = [
+                            { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
+                            { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                        ];
+                    }
+                    currentAccountId = parsedState.currentAccountId || (accounts.length > 0 ? accounts[0].id : null);
+                    nextAccountId = parsedState.nextAccountId || accounts.length;
+
+                    // Ensure all accounts have necessary properties (for backward compatibility)
+                    accounts.forEach(account => {
+                        if (typeof account.transactionCount === 'undefined') account.transactionCount = 0;
+                        if (typeof account.transactionAmount === 'undefined') account.transactionAmount = 0;
+                        if (typeof account.name === 'undefined') account.name = `账户 ${parseInt(account.id.split('_')[1]) + 1}`;
+                    });
+
+                } catch (e) {
+                    console.error("Error parsing saved state from localStorage:", e);
+                    // If parsing fails, reset to default accounts state
+                    accounts = [
+                        { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
+                        { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                    ];
+                    currentAccountId = 'account_0';
+                    nextAccountId = 2;
+                }
+            } else {
+                // If no saved state, initialize with two default accounts
+                accounts = [
+                    { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0 },
+                    { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0 }
+                ];
+                currentAccountId = 'account_0';
+                nextAccountId = 2;
+            }
+        }
+
+        /**
+         * Saves the current 'accounts' array, 'currentAccountId', and 'nextAccountId' to localStorage.
+         */
+        function saveState() {
+            localStorage.setItem('transactionCounterState', JSON.stringify({
+                accounts: accounts,
+                currentAccountId: currentAccountId,
+                nextAccountId: nextAccountId
+            }));
+        }
+
+        /**
+         * Renders or re-renders all account buttons in the UI.
+         * Attaches click listeners to each button.
+         */
+        function renderAccountButtons() {
+            // Clear existing buttons
+            accountButtonsContainer.innerHTML = '';
+
+            accounts.forEach(account => {
+                const button = document.createElement('button');
+                button.id = `btn-${account.id}`;
+                button.textContent = account.name;
+                button.classList.add('account-button'); // Add a common class for styling
+                if (account.id === currentAccountId) {
+                    button.classList.add('active');
+                }
+                button.addEventListener('click', () => switchAccount(account.id));
+                accountButtonsContainer.appendChild(button);
+            });
+        }
+
+        /**
+         * Updates the displayed values on the webpage based on the current account's data.
+         * Also updates the account name input field and transaction amount input field.
+         */
+        function updateDisplay() {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+
+            if (!currentAccountData) {
+                // This case should ideally not happen if currentAccountId is always valid
+                console.error("No current account data found for ID:", currentAccountId);
+                // Optionally, switch to the first account if available
+                if (accounts.length > 0) {
+                    switchAccount(accounts[0].id);
+                }
+                return;
+            }
+
+            // Update account name input and display
+            accountNameInput.value = currentAccountData.name;
+            currentAccountDisplay.textContent = currentAccountData.name;
+
+            // Update transaction count display
+            transactionCountDisplay.textContent = currentAccountData.transactionCount;
+
+            // Calculate and update total transaction value, formatted to two decimal places
+            const totalValue = currentAccountData.transactionCount * currentAccountData.transactionAmount;
+            totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
+
+            // Update the transaction amount input field with the current account's value
+            transactionAmountInput.value = currentAccountData.transactionAmount;
+
+            // Save the updated state to localStorage
+            saveState();
+        }
+
+        /**
+         * Switches the active account and updates the UI accordingly.
+         * @param {string} accountId - The ID of the account to switch to.
+         */
+        function switchAccount(accountId) {
+            currentAccountId = accountId;
+            // Remove 'active' class from all buttons and add to the current one
+            document.querySelectorAll('.account-selector button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const newActiveButton = document.getElementById(`btn-${accountId}`);
+            if (newActiveButton) {
+                newActiveButton.classList.add('active');
+            }
+            // Update the display to show the new account's data
+            updateDisplay();
+        }
+
+        /**
+         * Adds a new account to the system.
+         */
+        function addAccount() {
+            const newAccountId = `account_${nextAccountId++}`;
+            const newAccount = {
+                id: newAccountId,
+                name: `新账户 ${nextAccountId}`, // Default name for new account
+                transactionCount: 0,
+                transactionAmount: 0
+            };
+            accounts.push(newAccount);
+            renderAccountButtons(); // Re-render all buttons to include the new one
+            switchAccount(newAccountId); // Switch to the newly added account
+        }
+
+        // Event listener for changes in the account name input field
+        accountNameInput.addEventListener('input', (event) => {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccountData) {
+                currentAccountData.name = event.target.value;
+                // Update the button text immediately
+                const currentButton = document.getElementById(`btn-${currentAccountId}`);
+                if (currentButton) {
+                    currentButton.textContent = event.target.value;
+                }
+                currentAccountDisplay.textContent = event.target.value; // Update display text
+                saveState(); // Save state after name change
+            }
+        });
+
+        // Event listener for changes in the transaction amount input field
+        transactionAmountInput.addEventListener('input', (event) => {
+            let amount = parseFloat(event.target.value);
+            // Validate input: ensure it's a non-negative number
+            if (isNaN(amount) || amount < 0) {
+                amount = 0; // Default to 0 if invalid
+                event.target.value = 0; // Force input field to display 0
+            }
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccountData) {
+                currentAccountData.transactionAmount = amount;
+                updateDisplay(); // Update the display to reflect the new amount
+            }
+        });
+
+        // Global keyboard event listener for ArrowUp and ArrowDown keys
+        document.addEventListener('keydown', (event) => {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+            if (!currentAccountData) return; // Do nothing if no account is selected
+
+            if (event.key === 'ArrowUp') {
+                // Increment transaction count
+                currentAccountData.transactionCount++;
+                updateDisplay();
+                event.preventDefault(); // Prevent default browser scroll behavior
+            } else if (event.key === 'ArrowDown') {
+                // Decrement transaction count, but not below zero
+                if (currentAccountData.transactionCount > 0) {
+                    currentAccountData.transactionCount--;
+                    updateDisplay();
+                }
+                event.preventDefault(); // Prevent default browser scroll behavior
+            }
+        });
+
+        // Event listener for the "Add New Account" button
+        addAccountBtn.addEventListener('click', addAccount);
+
+        // Initialize the application when the page loads
+        // 1. Load any previously saved state
+        loadState();
+        // 2. Render account buttons based on loaded (or default) accounts
+        renderAccountButtons();
+        // 3. Ensure an account is selected and update the display
+        if (currentAccountId) {
+            updateDisplay();
+        } else if (accounts.length > 0) {
+            // If currentAccountId is null but accounts exist, default to the first one
+            switchAccount(accounts[0].id);
+        } else {
+            // If no accounts exist (e.g., first load and no default accounts were set), add one
+            addAccount();
+        }
+    </script>
+</body>
+</html>
