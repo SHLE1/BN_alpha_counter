@@ -1,223 +1,253 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>币安alpha交易计数器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Basic styling for the body */
+        /* 基础样式 */
         body {
-            font-family: 'Inter', sans-serif; /* Using Inter font */
+            font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f0f2f5; /* Light grey background */
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* 淡雅渐变背景 */
             margin: 0;
             padding: 20px;
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            box-sizing: border-box;
+            color: #333; /* 默认文字颜色 */
         }
 
-        /* Container for the entire application */
+        /* 应用容器 */
         .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px; /* Rounded corners for the container */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            background-color: rgba(255, 255, 255, 0.95); /* 半透明白色背景，增加层次感 */
+            padding: 35px 40px; /* 增加内边距 */
+            border-radius: 16px; /* 更圆润的边角 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* 更柔和、更深的阴影 */
             text-align: center;
             width: 100%;
-            max-width: 600px; /* Increased max width */
+            max-width: 650px; /* 稍微增加最大宽度 */
             box-sizing: border-box;
+            backdrop-filter: blur(10px); /* 毛玻璃效果 (部分浏览器支持) */
         }
 
-        /* Headings styling */
+        /* 标题样式 */
         h1 {
-            color: #2c3e50; /* Dark blue-grey for main heading */
-            margin-bottom: 25px;
-            font-size: 2.2em;
+            color: #1a2b48; /* 深蓝灰色，更稳重 */
+            margin-bottom: 30px;
+            font-size: 2.5em; /* 稍微增大字体 */
+            font-weight: 700; /* 加粗 */
         }
 
-        /* Account selector buttons container */
+        /* 账户选择按钮容器 */
         .account-selector {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             display: flex;
-            flex-wrap: wrap; /* Allow buttons to wrap to next line */
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 10px; /* Space between buttons */
+            gap: 12px; /* 按钮间距 */
         }
 
-        /* Styling for account buttons */
-        .account-selector button {
-            background-color: #3498db; /* Blue for inactive buttons */
+        /* 账户按钮样式 */
+        .account-selector button, #add-account-btn {
             color: white;
             border: none;
-            padding: 10px 20px; /* Slightly smaller padding */
-            border-radius: 8px; /* Rounded corners for buttons */
+            padding: 12px 22px; /* 调整内边距 */
+            border-radius: 10px; /* 更圆润的按钮边角 */
             cursor: pointer;
-            font-size: 1em; /* Slightly smaller font size */
+            font-size: 1em;
             font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transitions */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            white-space: nowrap; /* Prevent button text from wrapping */
+            transition: all 0.3s ease; /* 平滑过渡效果 */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.5px; /* 增加字母间距 */
+        }
+
+        .account-selector button {
+            background-color: #5a67d8; /* 柔和的靛蓝色 */
         }
 
         .account-selector button:hover {
-            background-color: #2980b9; /* Darker blue on hover */
-            transform: translateY(-2px); /* Slight lift effect */
+            background-color: #434190; /* 深一点的靛蓝色 */
+            transform: translateY(-3px); /* 轻微上浮效果 */
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
         }
 
         .account-selector button.active {
-            background-color: #27ae60; /* Green for active button */
-            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); /* Stronger shadow for active */
-            transform: translateY(0); /* No lift for active */
+            background-color: #38a169; /* 清新的绿色 */
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.4);
+            transform: translateY(0);
         }
 
-        /* Add Account button styling */
+        /* 添加账户按钮样式 */
         #add-account-btn {
-            background-color: #f39c12; /* Orange for add button */
-            margin-left: 10px;
-            padding: 10px 20px;
+            background-color: #dd6b20; /* 温暖的橙色 */
+            margin-left: 10px; /* 保持与账户按钮的间距 */
         }
 
         #add-account-btn:hover {
-            background-color: #e67e22; /* Darker orange on hover */
+            background-color: #c05621; /* 深橙色 */
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Input group styling */
-        .input-group {
-            margin-bottom: 25px;
+        /* 输入组样式 */
+        .input-group, .multiplier-group {
+            margin-bottom: 28px;
             text-align: left;
         }
 
-        .input-group label {
+        .input-group label, .multiplier-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #34495e; /* Darker text for labels */
-            font-size: 1.05em;
+            margin-bottom: 10px; /* 标签与输入框间距 */
+            color: #4a5568; /* 柔和的灰色 */
+            font-size: 1.1em; /* 稍微增大标签字体 */
             font-weight: 500;
         }
 
         .input-group input[type="number"],
-        .input-group input[type="text"] {
-            padding: 12px;
-            border: 1px solid #bdc3c7; /* Light grey border */
-            border-radius: 8px; /* Rounded corners for input */
-            width: calc(100% - 24px); /* Full width minus padding */
+        .input-group input[type="text"],
+        .multiplier-group input[type="number"] {
+            padding: 14px 18px; /* 调整输入框内边距 */
+            border: 1px solid #cbd5e0; /* 更浅的边框颜色 */
+            border-radius: 10px; /* 更圆润的输入框边角 */
+            width: calc(100% - 38px); /* 考虑内边距和边框后的宽度 */
             font-size: 1.1em;
-            color: #34495e;
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            color: #2d3748; /* 深灰色文字 */
+            box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fdfdfe; /* 非常浅的背景色 */
         }
 
-        .input-group input:focus {
-            border-color: #3498db; /* Blue border on focus */
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); /* Soft shadow on focus */
-            outline: none; /* Remove default outline */
+        .input-group input:focus,
+        .multiplier-group input[type="number"]:focus {
+            border-color: #5a67d8; /* 焦点时边框颜色与按钮呼应 */
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2); /* 焦点时外发光效果 */
+            outline: none;
         }
 
-        /* Checkbox styling */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-            margin-bottom: 25px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            margin-bottom: 0; /* Override default label margin */
-            font-size: 1em;
-            color: #34495e;
-        }
-
-        /* Display area for results */
+        /* 结果显示区域 */
         .display-area {
-            margin-top: 25px;
-            border-top: 1px solid #ecf0f1; /* Light border at the top */
-            padding-top: 25px;
+            margin-top: 30px;
+            border-top: 1px solid #e2e8f0; /* 更浅的分隔线 */
+            padding-top: 30px;
         }
 
         .display-area p {
-            font-size: 1.4em;
-            color: #34495e;
-            margin: 12px 0;
+            font-size: 1.5em; /* 增大显示字体 */
+            color: #2d3748;
+            margin: 15px 0; /* 调整间距 */
             display: flex;
-            justify-content: space-between; /* Space out label and value */
+            justify-content: space-between;
             align-items: center;
         }
 
         .display-area p strong {
             font-weight: 600;
-            margin-right: 10px; /* Space between label and value */
+            color: #4a5568; /* 标签文字颜色 */
+            margin-right: 15px;
         }
 
-        /* Highlighted text for values */
+        /* 高亮数值样式 */
         .highlight {
-            font-weight: bold;
-            color: #e74c3c; /* Red for emphasis */
-            font-size: 1.5em; /* Larger font for values */
-            flex-grow: 1; /* Allow value to take up remaining space */
-            text-align: right; /* Align value to the right */
+            font-weight: 700; /* 加粗 */
+            color: #c53030; /* 强调红色 */
+            font-size: 1.6em; /* 突出数值 */
+            flex-grow: 1;
+            text-align: right;
         }
 
-        /* Instructions text */
+        /* 说明文字 */
         .instructions {
-            margin-top: 30px;
-            font-size: 0.95em;
-            color: #7f8c8d; /* Grey for instructions */
-            line-height: 1.5;
+            margin-top: 35px;
+            font-size: 1em; /* 增大说明文字字体 */
+            color: #718096; /* 柔和的灰色 */
+            line-height: 1.6;
         }
 
-        /* Keyboard key styling */
+        /* 键盘按键样式 */
         kbd {
-            background-color: #ecf0f1;
-            border-radius: 4px;
-            padding: 3px 7px;
-            border: 1px solid #bdc3c7;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #34495e;
-            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+            background-color: #edf2f7; /* 浅灰色背景 */
+            border-radius: 6px; /* 更圆润 */
+            padding: 5px 9px; /* 调整内边距 */
+            border: 1px solid #d2d6dc;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* 更现代的等宽字体 */
+            font-size: 0.95em;
+            color: #2d3748;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05); /* 轻微阴影 */
         }
 
-        /* Responsive adjustments */
+        /* 作者信息 */
+        .author-credit {
+            margin-top: 40px; /* 增加顶部间距 */
+            font-size: 0.95em;
+            color: #718096;
+        }
+        .author-credit a {
+            color: #5a67d8; /* 与按钮颜色呼应 */
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .author-credit a:hover {
+            text-decoration: underline;
+            color: #434190;
+        }
+
+        /* 响应式调整 */
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
+                padding: 25px 20px; /* 调整小屏幕内边距 */
+                margin-top: 20px; /* 顶部留白 */
+                margin-bottom: 20px; /* 底部留白 */
             }
             h1 {
-                font-size: 1.8em;
+                font-size: 2em; /* 调整标题大小 */
             }
-            .account-selector button {
-                padding: 8px 15px;
-                font-size: 0.9em;
+            .account-selector button, #add-account-btn {
+                padding: 10px 18px;
+                font-size: 0.95em;
+                width: calc(50% - 6px); /* 小屏幕下按钮两列显示 */
+                margin-left: 0; /* 移除添加按钮的左边距 */
             }
             #add-account-btn {
-                margin-top: 10px; /* Add margin for smaller screens */
-                margin-left: 0;
-                width: 100%; /* Full width for add button */
+                 width: 100%; /* 添加账户按钮在小屏幕下占满一行 */
+                 margin-top: 10px;
             }
+            .account-selector {
+                gap: 8px; /* 减小按钮间距 */
+            }
+
             .display-area p {
-                font-size: 1.2em;
-            }
-            .highlight {
                 font-size: 1.3em;
             }
+            .highlight {
+                font-size: 1.4em;
+            }
+            .input-group input[type="number"],
+            .input-group input[type="text"],
+            .multiplier-group input[type="number"] {
+                font-size: 1em;
+                padding: 12px 15px;
+                width: calc(100% - 32px);
+            }
+            .instructions {
+                font-size: 0.9em;
+            }
         }
+         @media (max-width: 400px) {
+            .account-selector button {
+                 width: 100%; /* 在非常小的屏幕上，账户按钮也占满一行 */
+            }
+         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>币安alpha交易额计数器</h1>
         <div class="account-selector" id="account-buttons-container">
-        </div>
+            </div>
         <button id="add-account-btn">添加新账户</button>
 
         <div class="input-group">
@@ -230,19 +260,23 @@
             <input type="number" id="transaction-amount" placeholder="例如: 100" value="0" min="0">
         </div>
 
-        <div class="checkbox-group">
-            <input type="checkbox" id="double-transaction-checkbox">
-            <label for="double-transaction-checkbox">双倍交易额</label>
+        <div class="multiplier-group">
+            <label for="transaction-multiplier-input">交易额倍数:</label>
+            <input type="number" id="transaction-multiplier-input" value="1" min="0.1" step="0.1">
         </div>
 
         <div class="display-area">
-            <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight"></span></p>
+            <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight">N/A</span></p>
             <p><strong>交易笔数:</strong> <span id="transaction-count" class="highlight">0</span></p>
             <p><strong>总交易额:</strong> <span id="total-transaction-value" class="highlight">0.00</span></p>
         </div>
 
         <p class="instructions">
             按 <kbd>上</kbd> 键增加交易笔数，按 <kbd>下</kbd> 键减少交易笔数。
+        </p>
+
+        <p class="author-credit">
+            作者: <a href="https://x.com/0xM3tr0" target="_blank" rel="noopener noreferrer">X: @0xM3tr0</a>
         </p>
     </div>
 
@@ -252,23 +286,18 @@
         const addAccountBtn = document.getElementById('add-account-btn');
         const accountNameInput = document.getElementById('account-name-input');
         const transactionAmountInput = document.getElementById('transaction-amount');
-        const doubleTransactionCheckbox = document.getElementById('double-transaction-checkbox'); // New DOM element
+        const transactionMultiplierInput = document.getElementById('transaction-multiplier-input');
         const transactionCountDisplay = document.getElementById('transaction-count');
         const totalTransactionValueDisplay = document.getElementById('total-transaction-value');
         const currentAccountDisplay = document.getElementById('current-account-display');
 
         // Data structure to store all accounts
-        // Each account object has an id, name, transactionCount, transactionAmount, and doubleTransaction.
         let accounts = [];
-        // The ID of the currently active account
         let currentAccountId = null;
-        // Counter for generating unique IDs for new accounts
         let nextAccountId = 0;
 
         /**
          * Loads the saved state from localStorage.
-         * If a state exists, it parses it and updates the 'accounts' array,
-         * 'currentAccountId', and 'nextAccountId'.
          */
         function loadState() {
             const savedState = localStorage.getItem('transactionCounterState');
@@ -278,39 +307,39 @@
                     if (parsedState.accounts && Array.isArray(parsedState.accounts)) {
                         accounts = parsedState.accounts;
                     } else {
-                        // Fallback if accounts array is not valid
                         accounts = [
-                            { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
-                            { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
+                            { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 },
+                            { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 }
                         ];
                     }
                     currentAccountId = parsedState.currentAccountId || (accounts.length > 0 ? accounts[0].id : null);
                     nextAccountId = parsedState.nextAccountId || accounts.length;
 
-                    // Ensure all accounts have necessary properties (for backward compatibility)
                     accounts.forEach(account => {
                         if (typeof account.transactionCount === 'undefined') account.transactionCount = 0;
                         if (typeof account.transactionAmount === 'undefined') account.transactionAmount = 0;
-                        if (typeof account.name === 'undefined') account.name = `账户 ${parseInt(account.id.split('_')[1]) + 1}`;
-                        // Initialize new 'doubleTransaction' property if it doesn't exist
-                        if (typeof account.doubleTransaction === 'undefined') account.doubleTransaction = false;
+                        if (typeof account.name === 'undefined') account.name = `账户 ${account.id.split('_')[1] ? parseInt(account.id.split('_')[1]) + 1 : 'New'}`;
+                        
+                        if (typeof account.doubleTransaction !== 'undefined') {
+                            account.transactionMultiplier = account.doubleTransaction ? 2 : 1;
+                            delete account.doubleTransaction;
+                        }
+                        if (typeof account.transactionMultiplier === 'undefined') account.transactionMultiplier = 1;
                     });
 
                 } catch (e) {
-                    console.error("Error parsing saved state from localStorage:", e);
-                    // If parsing fails, reset to default accounts state
+                    console.error("解析localStorage中的状态时出错:", e);
                     accounts = [
-                        { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
-                        { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
+                        { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 },
+                        { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 }
                     ];
                     currentAccountId = 'account_0';
                     nextAccountId = 2;
                 }
             } else {
-                // If no saved state, initialize with two default accounts
                 accounts = [
-                    { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, doubleTransaction: false },
-                    { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, doubleTransaction: false }
+                    { id: 'account_0', name: '账户 A', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 },
+                    { id: 'account_1', name: '账户 B', transactionCount: 0, transactionAmount: 0, transactionMultiplier: 1 }
                 ];
                 currentAccountId = 'account_0';
                 nextAccountId = 2;
@@ -318,7 +347,7 @@
         }
 
         /**
-         * Saves the current 'accounts' array, 'currentAccountId', and 'nextAccountId' to localStorage.
+         * Saves the current state to localStorage.
          */
         function saveState() {
             localStorage.setItem('transactionCounterState', JSON.stringify({
@@ -329,18 +358,15 @@
         }
 
         /**
-         * Renders or re-renders all account buttons in the UI.
-         * Attaches click listeners to each button.
+         * Renders account buttons in the UI.
          */
         function renderAccountButtons() {
-            // Clear existing buttons
             accountButtonsContainer.innerHTML = '';
-
             accounts.forEach(account => {
                 const button = document.createElement('button');
                 button.id = `btn-${account.id}`;
                 button.textContent = account.name;
-                button.classList.add('account-button'); // Add a common class for styling
+                button.classList.add('account-button');
                 if (account.id === currentAccountId) {
                     button.classList.add('active');
                 }
@@ -350,57 +376,59 @@
         }
 
         /**
-         * Updates the displayed values on the webpage based on the current account's data.
-         * Also updates the account name input field, transaction amount input field,
-         * and the double transaction checkbox.
+         * Updates the UI display based on the current account's data.
          */
         function updateDisplay() {
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
 
             if (!currentAccountData) {
-                // This case should ideally not happen if currentAccountId is always valid
-                console.error("No current account data found for ID:", currentAccountId);
-                // Optionally, switch to the first account if available
-                if (accounts.length > 0) {
+                console.warn("未找到当前账户数据，ID:", currentAccountId); // 使用 warn 级别
+                currentAccountDisplay.textContent = "无"; // 更明确的无账户提示
+                transactionCountDisplay.textContent = "0";
+                totalTransactionValueDisplay.textContent = "0.00";
+                accountNameInput.value = "";
+                transactionAmountInput.value = "0";
+                transactionMultiplierInput.value = "1";
+                
+                // 禁用输入字段，因为没有活动账户
+                accountNameInput.disabled = true;
+                transactionAmountInput.disabled = true;
+                transactionMultiplierInput.disabled = true;
+
+                if (accounts.length > 0) { // 如果还有其他账户，则切换到第一个
                     switchAccount(accounts[0].id);
+                } else {
+                    // 如果一个账户都没有，可以考虑提示用户添加账户
+                    currentAccountDisplay.textContent = "请添加账户";
                 }
+                saveState(); // 即使没有当前账户，也保存一下状态（可能 accounts 数组为空）
                 return;
             }
+            
+            // 如果有活动账户，确保输入字段是启用的
+            accountNameInput.disabled = false;
+            transactionAmountInput.disabled = false;
+            transactionMultiplierInput.disabled = false;
 
-            // Update account name input and display
             accountNameInput.value = currentAccountData.name;
             currentAccountDisplay.textContent = currentAccountData.name;
-
-            // Update transaction count display
             transactionCountDisplay.textContent = currentAccountData.transactionCount;
 
-            // Determine the effective transaction amount based on the 'doubleTransaction' setting
-            let effectiveTransactionAmount = currentAccountData.transactionAmount;
-            if (currentAccountData.doubleTransaction) {
-                effectiveTransactionAmount *= 2;
-            }
-
-            // Calculate and update total transaction value, formatted to two decimal places
+            let effectiveTransactionAmount = currentAccountData.transactionAmount * currentAccountData.transactionMultiplier;
             const totalValue = currentAccountData.transactionCount * effectiveTransactionAmount;
             totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
 
-            // Update the transaction amount input field with the current account's value
             transactionAmountInput.value = currentAccountData.transactionAmount;
-
-            // Update the state of the double transaction checkbox
-            doubleTransactionCheckbox.checked = currentAccountData.doubleTransaction;
-
-            // Save the updated state to localStorage
+            transactionMultiplierInput.value = currentAccountData.transactionMultiplier;
             saveState();
         }
 
         /**
-         * Switches the active account and updates the UI accordingly.
+         * Switches to a different account.
          * @param {string} accountId - The ID of the account to switch to.
          */
         function switchAccount(accountId) {
             currentAccountId = accountId;
-            // Remove 'active' class from all buttons and add to the current one
             document.querySelectorAll('.account-selector button').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -408,104 +436,111 @@
             if (newActiveButton) {
                 newActiveButton.classList.add('active');
             }
-            // Update the display to show the new account's data
             updateDisplay();
         }
 
         /**
-         * Adds a new account to the system.
+         * Adds a new account.
          */
         function addAccount() {
             const newAccountId = `account_${nextAccountId++}`;
             const newAccount = {
                 id: newAccountId,
-                name: `新账户 ${nextAccountId}`, // Default name for new account
+                name: `新账户 ${nextAccountId}`,
                 transactionCount: 0,
                 transactionAmount: 0,
-                doubleTransaction: false // Initialize new accounts with doubleTransaction off
+                transactionMultiplier: 1
             };
             accounts.push(newAccount);
-            renderAccountButtons(); // Re-render all buttons to include the new one
-            switchAccount(newAccountId); // Switch to the newly added account
+            renderAccountButtons();
+            switchAccount(newAccountId);
         }
 
-        // Event listener for changes in the account name input field
+        // Event listener for account name input
         accountNameInput.addEventListener('input', (event) => {
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
                 currentAccountData.name = event.target.value;
-                // Update the button text immediately
                 const currentButton = document.getElementById(`btn-${currentAccountId}`);
                 if (currentButton) {
                     currentButton.textContent = event.target.value;
                 }
-                currentAccountDisplay.textContent = event.target.value; // Update display text
-                saveState(); // Save state after name change
+                currentAccountDisplay.textContent = event.target.value;
+                saveState();
             }
         });
 
-        // Event listener for changes in the transaction amount input field
+        // Event listener for transaction amount input
         transactionAmountInput.addEventListener('input', (event) => {
             let amount = parseFloat(event.target.value);
-            // Validate input: ensure it's a non-negative number
             if (isNaN(amount) || amount < 0) {
-                amount = 0; // Default to 0 if invalid
-                event.target.value = 0; // Force input field to display 0
+                amount = 0;
+                event.target.value = 0;
             }
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
                 currentAccountData.transactionAmount = amount;
-                updateDisplay(); // Update the display to reflect the new amount
+                updateDisplay();
             }
         });
 
-        // New event listener for the double transaction checkbox
-        doubleTransactionCheckbox.addEventListener('change', (event) => {
+        // Event listener for transaction multiplier input
+        transactionMultiplierInput.addEventListener('input', (event) => {
+            let multiplier = parseFloat(event.target.value);
+            if (isNaN(multiplier) || multiplier <= 0) { // 乘数不能为0或负数
+                multiplier = 1; // 如果输入无效，默认为1
+                event.target.value = 1;
+            }
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
-                currentAccountData.doubleTransaction = event.target.checked;
-                updateDisplay(); // Recalculate and update display based on new setting
+                currentAccountData.transactionMultiplier = multiplier;
+                updateDisplay();
             }
         });
 
-        // Global keyboard event listener for ArrowUp and ArrowDown keys
+        // Global keyboard event listener
         document.addEventListener('keydown', (event) => {
+            if (document.activeElement === accountNameInput || 
+                document.activeElement === transactionAmountInput ||
+                document.activeElement === transactionMultiplierInput) {
+                return; // 如果焦点在输入框内，则不响应快捷键
+            }
+
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (!currentAccountData) return; // Do nothing if no account is selected
+            if (!currentAccountData) return;
 
             if (event.key === 'ArrowUp') {
-                // Increment transaction count
                 currentAccountData.transactionCount++;
                 updateDisplay();
-                event.preventDefault(); // Prevent default browser scroll behavior
+                event.preventDefault();
             } else if (event.key === 'ArrowDown') {
-                // Decrement transaction count, but not below zero
                 if (currentAccountData.transactionCount > 0) {
                     currentAccountData.transactionCount--;
                     updateDisplay();
                 }
-                event.preventDefault(); // Prevent default browser scroll behavior
+                event.preventDefault();
             }
         });
 
-        // Event listener for the "Add New Account" button
+        // Event listener for add account button
         addAccountBtn.addEventListener('click', addAccount);
 
-        // Initialize the application when the page loads
-        // 1. Load any previously saved state
-        loadState();
-        // 2. Render account buttons based on loaded (or default) accounts
-        renderAccountButtons();
-        // 3. Ensure an account is selected and update the display
-        if (currentAccountId) {
-            updateDisplay();
-        } else if (accounts.length > 0) {
-            // If currentAccountId is null but accounts exist, default to the first one
-            switchAccount(accounts[0].id);
-        } else {
-            // If no accounts exist (e.g., first load and no default accounts were set), add one
-            addAccount();
+        // Initialize the application
+        function initializeApp() {
+            loadState();
+            renderAccountButtons();
+            if (currentAccountId && accounts.find(acc => acc.id === currentAccountId)) {
+                updateDisplay();
+            } else if (accounts.length > 0) {
+                switchAccount(accounts[0].id);
+            } else {
+                // 如果没有账户，可以主动添加一个，或者仅更新显示（当前行为）
+                updateDisplay(); // 更新显示，此时会提示添加账户或禁用输入
+                // addAccount(); // 或者，如果希望总是至少有一个账户，则取消此行注释
+            }
         }
+        
+        initializeApp();
     </script>
 </body>
 </html>
