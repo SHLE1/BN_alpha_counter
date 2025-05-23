@@ -15,6 +15,9 @@
             --add-hover-color: #c05621;
             --delete-color: #c53030; /* 强调红色 (用于删除) */
             --delete-hover-color: #9b2c2c;
+            --reset-color: #f6e05e; /* 柔和的黄色 (用于归零) */
+            --reset-hover-color: #ecc94b;
+            --reset-text-color: #744210; /* 黄色按钮的深色文字，确保对比度 */
             --error-color: #e53e3e; /* 错误提示红色 */
             --toast-background-color: #2d3748; /* 深灰色用于提示 */
             --text-dark: #1a2b48;
@@ -56,8 +59,8 @@
             max-width: 650px;
             box-sizing: border-box;
             backdrop-filter: blur(10px);
-            position: relative; 
-            overflow: hidden; 
+            position: relative;
+            overflow: hidden;
         }
 
         h1 {
@@ -75,7 +78,7 @@
             gap: 12px;
         }
 
-        .account-selector button, #add-account-btn, #delete-account-btn {
+        .account-selector button, #add-account-btn, #delete-account-btn, #reset-count-btn {
             color: white;
             border: none;
             padding: 10px 20px;
@@ -90,7 +93,7 @@
             align-items: center;
             gap: 8px;
         }
-        .account-selector button .icon, #add-account-btn .icon, #delete-account-btn .icon {
+        .account-selector button .icon, #add-account-btn .icon, #delete-account-btn .icon, #reset-count-btn .icon {
             width: 16px;
             height: 16px;
             fill: currentColor;
@@ -109,7 +112,7 @@
             box-shadow: 0 4px 15px rgba(56, 161, 105, 0.4);
             transform: translateY(0);
         }
-        
+
         .account-actions {
             display: flex;
             justify-content: center;
@@ -127,7 +130,7 @@
             box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
         }
 
-        #delete-account-btn {
+        #delete-account-btn { /* Style remains the same, only order changes */
             background-color: var(--delete-color);
         }
         #delete-account-btn:hover {
@@ -135,18 +138,29 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 12px rgba(0,0,0,0.2);
         }
-        #delete-account-btn:disabled {
+        #delete-account-btn:disabled, #reset-count-btn:disabled {
             background-color: #aaa;
             cursor: not-allowed;
             opacity: 0.7;
             transform: translateY(0);
             box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            color: #e0e0e0;
+        }
+        #reset-count-btn { /* Style remains the same, only order changes */
+            background-color: var(--reset-color);
+            color: var(--reset-text-color);
+        }
+        #reset-count-btn:hover {
+            background-color: var(--reset-hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
         }
 
+
         .input-group, .multiplier-group {
-            margin-bottom: 15px; /* Reduced margin to accommodate error message */
+            margin-bottom: 15px;
             text-align: left;
-            position: relative; /* For error message positioning */
+            position: relative;
         }
         .input-group label, .multiplier-group label {
             display: block;
@@ -174,7 +188,7 @@
             box-shadow: 0 0 0 3px var(--focus-ring-color);
             outline: none;
         }
-        .input-group input.input-error, /* Style for input with error */
+        .input-group input.input-error,
         .multiplier-group input.input-error {
             border-color: var(--error-color);
             box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
@@ -184,23 +198,23 @@
             color: var(--error-color);
             font-size: 0.85em;
             margin-top: 6px;
-            min-height: 1.2em; /* Reserve space to prevent layout shift */
+            min-height: 1.2em;
         }
-        
+
         .account-details-wrapper {
             transition: opacity 0.3s ease-in-out;
-            margin-bottom: 28px; /* Original margin-bottom for groups, now on wrapper */
+            margin-bottom: 28px;
         }
         .account-details-wrapper.fading {
             opacity: 0;
         }
-        .account-details-wrapper.hidden { /* To hide when empty state is shown */
+        .account-details-wrapper.hidden {
             display: none;
         }
 
         /* Empty State Styles */
         .empty-state {
-            display: none; /* Hidden by default */
+            display: none;
             padding: 40px 20px;
             text-align: center;
             border: 2px dashed var(--border-color);
@@ -227,9 +241,6 @@
             margin-bottom: 25px;
             line-height: 1.6;
         }
-        /* We can reuse the #add-account-btn or create a specific one */
-        /* For now, the global #add-account-btn will be used */
-
 
         .display-area {
             margin-top: 30px;
@@ -323,7 +334,7 @@
             h1 { font-size: 2em; }
             .account-selector button { width: calc(50% - 10px); padding: 10px 15px; }
             .account-actions { flex-direction: column; }
-            #add-account-btn, #delete-account-btn { width: 100%; margin-left: 0; padding: 12px 18px; }
+            #add-account-btn, #delete-account-btn, #reset-count-btn { width: 100%; margin-left: 0; padding: 12px 18px; }
             .account-selector { gap: 8px; }
             .display-area p { font-size: 1.3em; }
             .highlight { font-size: 1.2em; }
@@ -341,13 +352,13 @@
             .modal-content { padding: 20px; }
             .modal-content h2 { font-size: 1.4em; }
             .modal-content p { font-size: 1em; }
-         }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>币安alpha交易额计数器</h1>
-        
+
         <div class="account-selector" id="account-buttons-container">
             </div>
 
@@ -360,8 +371,12 @@
                 <svg class="icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                 删除当前账户
             </button>
+            <button id="reset-count-btn" disabled>
+                <svg class="icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M15.322 15.322a8 8 0 110-10.605A8.002 8.002 0 0110 18a7.953 7.953 0 01-3.949-.996l-.001-.001zm-.707-.707A6.002 6.002 0 0010 16a6 6 0 100-12 6 6 0 00-4.615 9.293l-1.06 1.06A8.002 8.002 0 0110 2a8 8 0 115.322 13.322zM10.75 9V5h-1.5v4.75L13.03 13l.75-.75-3.03-3.03z" clip-rule="evenodd" /></svg>
+                计数归零
+            </button>
         </div>
-        
+
         <div class="empty-state" id="empty-state-container">
             <svg class="empty-state-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
@@ -369,10 +384,10 @@
                 <path d="M2 11a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z"></path>
             </svg>
             <h2>没有账户</h2>
-            <p>看起来您还没有添加任何交易账户。点击下方的“添加新账户”按钮开始吧！</p>
-            </div>
+            <p>看起来您还没有添加任何交易账户。点击上方的“添加新账户”按钮开始吧！</p>
+        </div>
 
-        <div class="account-details-wrapper" id="account-details-section"> 
+        <div class="account-details-wrapper" id="account-details-section">
             <div class="input-group">
                 <label for="account-name-input">当前账户名称:</label>
                 <input type="text" id="account-name-input" placeholder="输入账户名称">
@@ -425,13 +440,14 @@
         const accountButtonsContainer = document.getElementById('account-buttons-container');
         const addAccountBtn = document.getElementById('add-account-btn');
         const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const resetCountBtn = document.getElementById('reset-count-btn');
         const accountNameInput = document.getElementById('account-name-input');
         const transactionAmountInput = document.getElementById('transaction-amount');
         const transactionMultiplierInput = document.getElementById('transaction-multiplier-input');
         const transactionCountDisplay = document.getElementById('transaction-count');
         const totalTransactionValueDisplay = document.getElementById('total-transaction-value');
         const currentAccountDisplay = document.getElementById('current-account-display');
-        const accountDetailsWrapper = document.getElementById('account-details-section'); // Changed from querySelector
+        const accountDetailsWrapper = document.getElementById('account-details-section');
         const emptyStateContainer = document.getElementById('empty-state-container');
 
         // Error message spans
@@ -451,19 +467,21 @@
         let nextAccountId = 0;
         let accountIdToDelete = null;
 
+        // Initialization
         function initializeApp() {
             loadState();
             renderAccountButtons();
-            updateDeleteButtonState();
+            updateActionButtonsState();
             if (currentAccountId && accounts.find(acc => acc.id === currentAccountId)) {
                 updateDisplay(false);
             } else if (accounts.length > 0) {
                 switchAccount(accounts[0].id, false);
             } else {
-                updateDisplay(false); // This will now handle showing the empty state
+                updateDisplay(false);
             }
         }
 
+        // Load state from localStorage
         function loadState() {
             const savedState = localStorage.getItem('transactionCounterState');
             if (savedState) {
@@ -482,6 +500,7 @@
             }
         }
 
+        // Ensure data integrity for each account
         function ensureAccountDataIntegrity(account) {
             if (typeof account.transactionCount === 'undefined') account.transactionCount = 0;
             if (typeof account.transactionAmount === 'undefined') account.transactionAmount = 0;
@@ -493,21 +512,25 @@
             if (typeof account.transactionMultiplier === 'undefined') account.transactionMultiplier = 1;
         }
 
+        // Save state to localStorage
         function saveState(showToastFlag = true) {
             localStorage.setItem('transactionCounterState', JSON.stringify({
                 accounts: accounts, currentAccountId: currentAccountId, nextAccountId: nextAccountId
             }));
             if (showToastFlag) showToast("已保存");
         }
-        
-        function getDefaultAccounts() { return []; } // Start with no default accounts to test empty state
 
+        // Get default accounts (empty array)
+        function getDefaultAccounts() { return []; }
+
+        // Reset to default state (no accounts)
         function resetToDefaultState() {
             accounts = getDefaultAccounts();
             currentAccountId = null;
             nextAccountId = 0;
         }
 
+        // Render account selection buttons
         function renderAccountButtons() {
             accountButtonsContainer.innerHTML = '';
             accounts.forEach(account => {
@@ -521,14 +544,13 @@
             });
         }
 
+        // Update UI display based on current account data
         function updateDisplay(triggerSaveAndToast = true) {
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            
-            if (accounts.length === 0) {
+
+            if (accounts.length === 0 || !currentAccountData) {
                 emptyStateContainer.classList.add('visible');
                 accountDetailsWrapper.classList.add('hidden');
-                deleteAccountBtn.disabled = true; // Disable delete if no accounts
-                // Ensure other fields are cleared/reset if needed, though they are hidden
                 currentAccountDisplay.textContent = "N/A";
                 transactionCountDisplay.textContent = "0";
                 totalTransactionValueDisplay.textContent = "0.00";
@@ -538,43 +560,43 @@
             } else {
                 emptyStateContainer.classList.remove('visible');
                 accountDetailsWrapper.classList.remove('hidden');
-                accountDetailsWrapper.classList.add('fading'); // Start fade for content change
+                accountDetailsWrapper.classList.add('fading');
 
                 setTimeout(() => {
-                    if (!currentAccountData) { // Should ideally not happen if accounts.length > 0 and currentAccountId is managed
-                        if (accounts.length > 0) switchAccount(accounts[0].id, false); // Attempt to recover
-                        else { // This case means accounts became empty during the timeout, re-check empty state
-                             emptyStateContainer.classList.add('visible');
-                             accountDetailsWrapper.classList.add('hidden');
+                    const freshAccountData = accounts.find(acc => acc.id === currentAccountId);
+                    if (!freshAccountData) {
+                        if (accounts.length > 0) switchAccount(accounts[0].id, false);
+                        else {
+                            emptyStateContainer.classList.add('visible');
+                            accountDetailsWrapper.classList.add('hidden');
                         }
                     } else {
-                        accountNameInput.disabled = false;
-                        transactionAmountInput.disabled = false;
-                        transactionMultiplierInput.disabled = false;
-                        deleteAccountBtn.disabled = false;
-
-                        accountNameInput.value = currentAccountData.name;
-                        currentAccountDisplay.textContent = currentAccountData.name;
-                        transactionCountDisplay.textContent = currentAccountData.transactionCount;
-                        let effectiveTransactionAmount = currentAccountData.transactionAmount * currentAccountData.transactionMultiplier;
-                        const totalValue = currentAccountData.transactionCount * effectiveTransactionAmount;
+                        accountNameInput.value = freshAccountData.name;
+                        currentAccountDisplay.textContent = freshAccountData.name;
+                        transactionCountDisplay.textContent = freshAccountData.transactionCount;
+                        let effectiveTransactionAmount = freshAccountData.transactionAmount * freshAccountData.transactionMultiplier;
+                        const totalValue = freshAccountData.transactionCount * effectiveTransactionAmount;
                         totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
-                        transactionAmountInput.value = currentAccountData.transactionAmount;
-                        transactionMultiplierInput.value = currentAccountData.transactionMultiplier;
+                        transactionAmountInput.value = freshAccountData.transactionAmount;
+                        transactionMultiplierInput.value = freshAccountData.transactionMultiplier;
                     }
-                    if (triggerSaveAndToast && currentAccountData) saveState();
-                    else if (currentAccountData) saveState(false); // Save without toast if specified
-                    
+                    if (triggerSaveAndToast && freshAccountData) saveState();
+                    else if (freshAccountData) saveState(false);
+
                     accountDetailsWrapper.classList.remove('fading');
                 }, 150);
             }
-            updateDeleteButtonState(); // Always update delete button based on current state
-        }
-        
-        function updateDeleteButtonState() {
-            deleteAccountBtn.disabled = accounts.length === 0 || !currentAccountId;
+            updateActionButtonsState();
         }
 
+        // Update enabled/disabled state of action buttons
+        function updateActionButtonsState() {
+            const hasActiveAccount = accounts.length > 0 && currentAccountId && accounts.find(acc => acc.id === currentAccountId);
+            deleteAccountBtn.disabled = !hasActiveAccount;
+            resetCountBtn.disabled = !hasActiveAccount;
+        }
+
+        // Show toast notification
         function showToast(message) {
             if (toastTimeoutId) clearTimeout(toastTimeoutId);
             toastNotification.textContent = message;
@@ -585,20 +607,21 @@
             }, 2000);
         }
 
+        // Switch to a different account
         function switchAccount(accountId, triggerSaveAndToast = true) {
-            if (currentAccountId === accountId && !triggerSaveAndToast) return;
+            if (currentAccountId === accountId && !triggerSaveAndToast && accounts.find(acc => acc.id === currentAccountId)) return;
             currentAccountId = accountId;
             document.querySelectorAll('.account-selector button').forEach(btn => btn.classList.remove('active'));
             const newActiveButton = document.getElementById(`btn-${accountId}`);
             if (newActiveButton) newActiveButton.classList.add('active');
             updateDisplay(triggerSaveAndToast);
-            updateDeleteButtonState();
-            clearAllInputErrors(); // Clear errors when switching account
+            clearAllInputErrors();
         }
 
+        // Add a new account
         function addAccount() {
-            emptyStateContainer.classList.remove('visible'); // Hide empty state
-            accountDetailsWrapper.classList.remove('hidden'); // Show details form
+            emptyStateContainer.classList.remove('visible');
+            accountDetailsWrapper.classList.remove('hidden');
 
             const newAccountId = `account_${nextAccountId++}`;
             const newAccount = {
@@ -613,6 +636,7 @@
             saveState(false);
         }
 
+        // Handle request to delete the current account
         function handleDeleteAccountRequest() {
             if (!currentAccountId) return;
             const account = accounts.find(acc => acc.id === currentAccountId);
@@ -623,13 +647,14 @@
             }
         }
 
+        // Confirm and proceed with account deletion
         function confirmAccountDeletion() {
             if (!accountIdToDelete) return;
             const accountIndex = accounts.findIndex(acc => acc.id === accountIdToDelete);
             if (accountIndex > -1) {
                 accounts.splice(accountIndex, 1);
                 if (currentAccountId === accountIdToDelete) {
-                    currentAccountId = accounts.length > 0 ? accounts[Math.max(0, accountIndex -1)].id : null;
+                    currentAccountId = accounts.length > 0 ? accounts[Math.max(0, accountIndex - 1)].id : null;
                 }
             }
             renderAccountButtons();
@@ -638,18 +663,28 @@
                 if (newActiveButton) newActiveButton.classList.add('active');
                 updateDisplay(false);
             } else {
-                updateDisplay(false); // Will show empty state if no accounts left
+                updateDisplay(false);
             }
-            updateDeleteButtonState();
             closeDeleteModal();
             accountIdToDelete = null;
             saveState(false);
             showToast("账户已删除");
         }
-        
+
+        // Close the delete confirmation modal
         function closeDeleteModal() {
             deleteConfirmModal.style.display = 'none';
             accountIdToDelete = null;
+        }
+
+        // Reset transaction count for the current account
+        function resetCurrentAccountCount() {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccountData) {
+                currentAccountData.transactionCount = 0;
+                updateDisplay();
+                showToast("计数已归零");
+            }
         }
 
         // Input Validation and Error Display
@@ -663,55 +698,64 @@
             errorElement.textContent = '';
         }
         function clearAllInputErrors() {
-            clearInputError(accountNameInput, accountNameError); // Though name doesn't have specific validation here yet
+            clearInputError(accountNameInput, accountNameError);
             clearInputError(transactionAmountInput, transactionAmountError);
             clearInputError(transactionMultiplierInput, transactionMultiplierError);
         }
 
-
+        // Event Listeners
         accountNameInput.addEventListener('input', (event) => {
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
+                currentAccountData.name = event.target.value.trim() === '' ? `账户 ${currentAccountData.id.split('_')[1] ? parseInt(currentAccountData.id.split('_')[1]) + 1 : 'Unnamed'}` : event.target.value;
+                const currentButton = document.getElementById(`btn-${currentAccountId}`);
+                if (currentButton) currentButton.textContent = currentAccountData.name;
+                currentAccountDisplay.textContent = currentAccountData.name;
+                saveState();
+            }
+        });
+        accountNameInput.addEventListener('blur', (event) => {
+            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+             if (currentAccountData && event.target.value.trim() === '') {
+                event.target.value = `账户 ${currentAccountData.id.split('_')[1] ? parseInt(currentAccountData.id.split('_')[1]) + 1 : 'Unnamed'}`;
                 currentAccountData.name = event.target.value;
                 const currentButton = document.getElementById(`btn-${currentAccountId}`);
-                if (currentButton) currentButton.textContent = event.target.value;
-                currentAccountDisplay.textContent = event.target.value;
+                if (currentButton) currentButton.textContent = currentAccountData.name;
+                currentAccountDisplay.textContent = currentAccountData.name;
                 saveState();
             }
         });
 
+
         transactionAmountInput.addEventListener('input', (event) => {
-            clearInputError(transactionAmountInput, transactionAmountError); // Clear previous error
+            clearInputError(transactionAmountInput, transactionAmountError);
             const rawValue = event.target.value;
             let amount = parseFloat(rawValue);
 
             if (rawValue.trim() === '' || isNaN(amount) || amount < 0) {
-                if (rawValue.trim() !== '') { // Only show error if user typed something invalid, not just cleared it
-                     displayInputError(transactionAmountInput, transactionAmountError, "请输入有效的非负数字。");
+                if (rawValue.trim() !== '') {
+                    displayInputError(transactionAmountInput, transactionAmountError, "请输入有效的非负数字。");
                 }
-                amount = 0; // Still sanitize for backend logic
-                // Don't immediately set event.target.value to 0, let user see their mistake
             }
-            
+
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
-                currentAccountData.transactionAmount = isNaN(parseFloat(event.target.value)) || parseFloat(event.target.value) < 0 ? 0 : parseFloat(event.target.value); // Use sanitized value for saving
+                currentAccountData.transactionAmount = isNaN(parseFloat(event.target.value)) || parseFloat(event.target.value) < 0 ? 0 : parseFloat(event.target.value);
                 updateDisplay();
             }
         });
-         transactionAmountInput.addEventListener('blur', (event) => { // Sanitize on blur
+        transactionAmountInput.addEventListener('blur', (event) => {
             let amount = parseFloat(event.target.value);
             if (isNaN(amount) || amount < 0) {
-                event.target.value = 0; // Force correct value on blur if still invalid
-                clearInputError(transactionAmountInput, transactionAmountError); // Clear error as it's corrected
+                event.target.value = 0;
+                clearInputError(transactionAmountInput, transactionAmountError);
                 const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
                 if (currentAccountData) {
                     currentAccountData.transactionAmount = 0;
-                    updateDisplay(); // Update with corrected value
+                    updateDisplay();
                 }
             }
         });
-
 
         transactionMultiplierInput.addEventListener('input', (event) => {
             clearInputError(transactionMultiplierInput, transactionMultiplierError);
@@ -721,17 +765,16 @@
             if (rawValue.trim() === '' || isNaN(multiplier) || multiplier <= 0) {
                  if (rawValue.trim() !== '') {
                     displayInputError(transactionMultiplierInput, transactionMultiplierError, "请输入有效的正数。");
-                 }
-                multiplier = 1;
+                }
             }
-            
+
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (currentAccountData) {
                 currentAccountData.transactionMultiplier = isNaN(parseFloat(event.target.value)) || parseFloat(event.target.value) <=0 ? 1 : parseFloat(event.target.value);
                 updateDisplay();
             }
         });
-        transactionMultiplierInput.addEventListener('blur', (event) => { // Sanitize on blur
+         transactionMultiplierInput.addEventListener('blur', (event) => {
             let multiplier = parseFloat(event.target.value);
             if (isNaN(multiplier) || multiplier <= 0) {
                 event.target.value = 1;
@@ -744,12 +787,12 @@
             }
         });
 
-
         addAccountBtn.addEventListener('click', addAccount);
         deleteAccountBtn.addEventListener('click', handleDeleteAccountRequest);
+        resetCountBtn.addEventListener('click', resetCurrentAccountCount);
         confirmDeleteBtn.addEventListener('click', confirmAccountDeletion);
         cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-        
+
         window.addEventListener('click', (event) => {
             if (event.target === deleteConfirmModal) closeDeleteModal();
         });
@@ -760,7 +803,7 @@
                 return;
             }
             if ([accountNameInput, transactionAmountInput, transactionMultiplierInput].includes(document.activeElement)) {
-                return; 
+                return;
             }
             const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
             if (!currentAccountData) return;
@@ -777,7 +820,8 @@
                 event.preventDefault();
             }
         });
-        
+
+        // Start the application
         initializeApp();
     </script>
 </body>
