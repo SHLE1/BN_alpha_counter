@@ -302,7 +302,7 @@ export default function TransactionCounter() {
                 </TabsList>
                 <Button onClick={addAccount} size="sm" className="ml-2 bg-emerald-600 hover:bg-emerald-700">
                   <Plus className="h-4 w-4 mr-1" />
-                  添加
+                  添加新账户
                 </Button>
               </div>
 
