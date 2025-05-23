@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 
 interface Account {
   id: string
@@ -485,6 +486,15 @@ export default function TransactionCounter() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 添加 logo */}
+      <Image
+        src="/binance.svg"
+        alt="Binance Logo"
+        width={100}
+        height={100}
+        className="absolute top-4 right-4"
+      />
     </div>
   )
 }
