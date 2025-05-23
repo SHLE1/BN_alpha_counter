@@ -9,7 +9,10 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "币安 Alpha 交易计数器",
   description: "跟踪和管理您的币安 Alpha 交易",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: "/binance.svg" // favicon 文件应放置在 public 目录下
+  }
 }
 
 export default function RootLayout({
