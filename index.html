@@ -3,436 +3,726 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>币安alpha交易计数器</title>
+    <title>币安Alpha交易计数器</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* 基础样式 */
+        /* 基础样式和颜色定义 */
         :root {
-            --primary-color: #5a67d8; /* 柔和的靛蓝色 */
-            --primary-hover-color: #434190;
-            --active-color: #38a169; /* 清新的绿色 */
-            --add-color: #dd6b20; /* 温暖的橙色 */
-            --add-hover-color: #c05621;
-            --delete-color: #c53030; /* 强调红色 (用于删除) */
-            --delete-hover-color: #9b2c2c;
-            --reset-color: #f6e05e; /* 柔和的黄色 (用于归零) */
-            --reset-hover-color: #ecc94b;
-            --reset-text-color: #744210; /* 黄色按钮的深色文字，确保对比度 */
-            --error-color: #e53e3e; /* 错误提示红色 */
-            --toast-background-color: #2d3748; /* 深灰色用于提示 */
-            --text-dark: #1a2b48;
-            --text-medium: #2d3748;
-            --text-light: #4a5568;
-            --text-extra-light: #718096;
-            --border-color: #cbd5e0;
-            --border-light-color: #e2e8f0;
-            --background-gradient-start: #f5f7fa;
-            --background-gradient-end: #c3cfe2;
-            --container-background: rgba(255, 255, 255, 0.95);
-            --input-background: #fdfdfe;
-            --kbd-background: #edf2f7;
-            --kbd-border-color: #d2d6dc;
-            --focus-ring-color: rgba(90, 103, 216, 0.2);
+            --primary-color: #0066ff;
+            --primary-hover-color: #0052cc;
+            --primary-light: #e6f2ff;
+            --success-color: #00c851;
+            --success-hover-color: #00a543;
+            --warning-color: #ff8c00;
+            --warning-hover-color: #e67e00;
+            --danger-color: #ff4757;
+            --danger-hover-color: #ff3742;
+            --danger-light: #ffe6e6;
+            --secondary-color: #6c757d;
+            --secondary-hover-color: #5a6268;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6c757d;
+            --text-light: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-background: rgba(255, 255, 255, 0.95);
+            --input-background: #fafafa;
+            --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --border-radius-small: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
+            background: var(--background-gradient);
             margin: 0;
             padding: 20px;
-            box-sizing: border-box;
-            color: var(--text-medium);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .container {
-            background-color: var(--container-background);
-            padding: 35px 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            text-align: center;
+            background: var(--card-background);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-heavy);
             width: 100%;
-            max-width: 650px;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
+            max-width: 700px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 标题样式 */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 10px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--warning-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* 账户选择区域 */
+        .account-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .account-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 0.95rem;
             position: relative;
             overflow: hidden;
         }
 
-        h1 {
-            color: var(--text-dark);
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 700;
+        .account-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-        .account-selector {
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .account-selector button, #add-account-btn, #delete-account-btn, #reset-count-btn {
+        .account-btn.active {
+            background: var(--primary-color);
             color: white;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .account-btn.active::before {
+            content: '✓';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* 操作按钮组 */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1em;
+            border-radius: var(--border-radius);
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            letter-spacing: 0.5px;
-            display: inline-flex;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            justify-content: center;
+            min-height: 44px;
         }
-        .account-selector button .icon, #add-account-btn .icon, #delete-account-btn .icon, #reset-count-btn .icon {
-            width: 16px;
-            height: 16px;
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: var(--success-hover-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: var(--warning-hover-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: var(--danger-hover-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn:disabled {
+            background: var(--secondary-color);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
             fill: currentColor;
         }
 
-        .account-selector button {
-            background-color: var(--primary-color);
-        }
-        .account-selector button:hover {
-            background-color: var(--primary-hover-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-        }
-        .account-selector button.active {
-            background-color: var(--active-color);
-            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.4);
-            transform: translateY(0);
+        /* 表单样式 */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-light);
         }
 
-        .account-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-bottom: 25px;
-            flex-wrap: wrap;
         }
 
-        #add-account-btn {
-            background-color: var(--add-color);
-        }
-        #add-account-btn:hover {
-            background-color: var(--add-hover-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+        .form-group {
+            display: flex;
+            flex-direction: column;
         }
 
-        #delete-account-btn { /* Style remains the same, only order changes */
-            background-color: var(--delete-color);
-        }
-        #delete-account-btn:hover {
-            background-color: var(--delete-hover-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
-        }
-        #delete-account-btn:disabled, #reset-count-btn:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-            opacity: 0.7;
-            transform: translateY(0);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-            color: #e0e0e0;
-        }
-        #reset-count-btn { /* Style remains the same, only order changes */
-            background-color: var(--reset-color);
-            color: var(--reset-text-color);
-        }
-        #reset-count-btn:hover {
-            background-color: var(--reset-hover-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
-
-        .input-group, .multiplier-group {
-            margin-bottom: 15px;
-            text-align: left;
-            position: relative;
+        .form-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
         }
-        .input-group label, .multiplier-group label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--text-light);
-            font-size: 1.1em;
+
+        .form-input {
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-small);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--input-background);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger-color);
+            background: var(--danger-light);
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            min-height: 1.2rem;
+        }
+
+        /* 统计显示区域 */
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-light), white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius-small);
+            box-shadow: var(--shadow-light);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
             font-weight: 500;
         }
-        .input-group input[type="number"],
-        .input-group input[type="text"],
-        .multiplier-group input[type="number"] {
-            padding: 14px 18px;
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-value.highlight {
+            color: var(--danger-color);
+        }
+
+        /* 快捷键提示 */
+        .keyboard-shortcuts {
+            background: var(--input-background);
+            padding: 20px;
+            border-radius: var(--border-radius);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            width: calc(100% - 38px);
-            font-size: 1.1em;
-            color: var(--text-medium);
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: var(--input-background);
-        }
-        .input-group input:focus,
-        .multiplier-group input[type="number"]:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--focus-ring-color);
-            outline: none;
-        }
-        .input-group input.input-error,
-        .multiplier-group input.input-error {
-            border-color: var(--error-color);
-            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
-        }
-        .error-message {
-            display: block;
-            color: var(--error-color);
-            font-size: 0.85em;
-            margin-top: 6px;
-            min-height: 1.2em;
-        }
-
-        .account-details-wrapper {
-            transition: opacity 0.3s ease-in-out;
-            margin-bottom: 28px;
-        }
-        .account-details-wrapper.fading {
-            opacity: 0;
-        }
-        .account-details-wrapper.hidden {
-            display: none;
-        }
-
-        /* Empty State Styles */
-        .empty-state {
-            display: none;
-            padding: 40px 20px;
-            text-align: center;
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            margin: 30px 0;
-        }
-        .empty-state.visible {
-            display: block;
-        }
-        .empty-state-icon {
-            width: 60px;
-            height: 60px;
-            fill: var(--text-extra-light);
             margin-bottom: 20px;
         }
-        .empty-state h2 {
-            color: var(--text-dark);
-            font-size: 1.8em;
-            margin-bottom: 10px;
-        }
-        .empty-state p {
-            color: var(--text-light);
-            font-size: 1.1em;
-            margin-bottom: 25px;
-            line-height: 1.6;
+
+        .keyboard-shortcuts h3 {
+            margin: 0 0 15px 0;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
-        .display-area {
-            margin-top: 30px;
-            border-top: 1px solid var(--border-light-color);
-            padding-top: 30px;
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
         }
-        .display-area p {
-            font-size: 1.5em;
-            color: var(--text-medium);
-            margin: 15px 0;
+
+        .shortcut-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .display-area p strong {
-            font-weight: 600;
-            color: var(--text-light);
-            margin-right: 15px;
-        }
-        .highlight {
-            font-weight: 700;
-            color: var(--delete-color);
-            font-size: 1.35em;
-            flex-grow: 1;
-            text-align: right;
+            padding: 8px 0;
         }
 
-        .instructions {
-            margin-top: 35px;
-            font-size: 1em;
-            color: var(--text-extra-light);
+        .kbd {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--border-color);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            fill: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
             line-height: 1.6;
         }
-        kbd {
-            background-color: var(--kbd-background);
-            border-radius: 6px;
-            padding: 5px 9px;
-            border: 1px solid var(--kbd-border-color);
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            font-size: 0.95em;
-            color: var(--text-medium);
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05);
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
         }
 
-        .author-credit {
-            margin-top: 40px;
-            font-size: 0.95em;
-            color: var(--text-extra-light);
+        /* Toast 通知 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            font-weight: 500;
         }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* 作者信息 */
+        .author-credit {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
         .author-credit a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 600;
         }
+
         .author-credit a:hover {
             text-decoration: underline;
-            color: var(--primary-hover-color);
         }
 
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background-color: #fff; margin: auto; padding: 25px 30px; border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center;
-        }
-        .modal-content h2 { color: var(--text-dark); margin-top: 0; margin-bottom: 15px; font-size: 1.6em; }
-        .modal-content p { color: var(--text-light); margin-bottom: 25px; font-size: 1.1em; line-height: 1.5; }
-        .modal-actions { display: flex; justify-content: space-around; gap: 15px; }
-        .modal-actions button {
-            padding: 10px 20px; border-radius: 8px; font-size: 1em; font-weight: 600;
-            cursor: pointer; border: none; transition: background-color 0.2s ease;
-        }
-        #confirm-delete-btn { background-color: var(--delete-color); color: white; }
-        #confirm-delete-btn:hover { background-color: var(--delete-hover-color); }
-        #cancel-delete-btn { background-color: #ccc; color: var(--text-medium); }
-        #cancel-delete-btn:hover { background-color: #bbb; }
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
 
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background-color: var(--toast-background-color); color: white; padding: 12px 25px;
-            border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 2000;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, bottom 0.3s ease;
-            font-size: 0.95em;
-        }
-        .toast.show { opacity: 1; visibility: visible; bottom: 40px; }
+            .header h1 {
+                font-size: 2rem;
+            }
 
-        @media (max-width: 600px) {
-            .container { padding: 25px 20px; margin-top: 20px; margin-bottom: 20px; }
-            h1 { font-size: 2em; }
-            .account-selector button { width: calc(50% - 10px); padding: 10px 15px; }
-            .account-actions { flex-direction: column; }
-            #add-account-btn, #delete-account-btn, #reset-count-btn { width: 100%; margin-left: 0; padding: 12px 18px; }
-            .account-selector { gap: 8px; }
-            .display-area p { font-size: 1.3em; }
-            .highlight { font-size: 1.2em; }
-            .input-group input[type="number"], .input-group input[type="text"],
-            .multiplier-group input[type="number"] { font-size: 1em; padding: 12px 15px; width: calc(100% - 32px); }
-            .instructions { font-size: 0.9em; }
-            .toast { width: calc(100% - 40px); bottom: 20px; }
-            .toast.show { bottom: 30px; }
-            .empty-state h2 { font-size: 1.5em; }
-            .empty-state p { font-size: 1em; }
-            .empty-state-icon { width: 50px; height: 50px; }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shortcuts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
         }
-         @media (max-width: 400px) {
-            .account-selector button { width: 100%; }
-            .modal-content { padding: 20px; }
-            .modal-content h2 { font-size: 1.4em; }
-            .modal-content p { font-size: 1em; }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .stats-section {
+                padding: 20px;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 过渡动画 */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+
+        .invisible {
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>币安alpha交易额计数器</h1>
-
-        <div class="account-selector" id="account-buttons-container">
-            </div>
-
-        <div class="account-actions">
-            <button id="add-account-btn">
-                <svg class="icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                添加新账户
-            </button>
-            <button id="delete-account-btn" disabled>
-                <svg class="icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                删除当前账户
-            </button>
-            <button id="reset-count-btn" disabled>
-                <svg class="icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M15.322 15.322a8 8 0 110-10.605A8.002 8.002 0 0110 18a7.953 7.953 0 01-3.949-.996l-.001-.001zm-.707-.707A6.002 6.002 0 0010 16a6 6 0 100-12 6 6 0 00-4.615 9.293l-1.06 1.06A8.002 8.002 0 0110 2a8 8 0 115.322 13.322zM10.75 9V5h-1.5v4.75L13.03 13l.75-.75-3.03-3.03z" clip-rule="evenodd" /></svg>
-                计数归零
-            </button>
+        <!-- 标题区域 -->
+        <div class="header">
+            <h1>币安Alpha交易计数器</h1>
+            <p>专业的交易笔数统计工具</p>
         </div>
 
-        <div class="empty-state" id="empty-state-container">
-            <svg class="empty-state-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
-                <path d="M10 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
-                <path d="M2 11a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z"></path>
+        <!-- 账户管理区域 -->
+        <div class="account-section">
+            <div class="section-title">
+                <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                </svg>
+                账户选择
+            </div>
+            
+            <div class="account-grid" id="account-buttons-container">
+                <!-- 账户按钮将动态生成 -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="add-account-btn">
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                    </svg>
+                    添加新账户
+                </button>
+                <button class="btn btn-danger" id="delete-account-btn" disabled>
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    删除账户
+                </button>
+                <button class="btn btn-warning" id="reset-count-btn" disabled>
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                    </svg>
+                    重置计数
+                </button>
+            </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div class="empty-state hidden" id="empty-state-container">
+            <svg class="empty-state-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
             </svg>
-            <h2>没有账户</h2>
-            <p>看起来您还没有添加任何交易账户。点击上方的“添加新账户”按钮开始吧！</p>
+            <h2>暂无账户</h2>
+            <p>您还没有添加任何交易账户，点击"添加新账户"开始使用吧！</p>
         </div>
 
-        <div class="account-details-wrapper" id="account-details-section">
-            <div class="input-group">
-                <label for="account-name-input">当前账户名称:</label>
-                <input type="text" id="account-name-input" placeholder="输入账户名称">
-                <span class="error-message" id="account-name-error"></span>
+        <!-- 账户详情表单 -->
+        <div class="form-section hidden" id="account-details-section">
+            <div class="section-title">
+                <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                </svg>
+                账户设置
             </div>
 
-            <div class="input-group">
-                <label for="transaction-amount">请输入每次交易数量:</label>
-                <input type="number" id="transaction-amount" placeholder="例如: 100" value="0" min="0">
-                <span class="error-message" id="transaction-amount-error"></span>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label class="form-label" for="account-name-input">账户名称</label>
+                    <input type="text" class="form-input" id="account-name-input" placeholder="输入账户名称">
+                    <span class="error-message" id="account-name-error"></span>
+                </div>
             </div>
 
-            <div class="multiplier-group">
-                <label for="transaction-multiplier-input">交易额倍数:</label>
-                <input type="number" id="transaction-multiplier-input" value="1" min="0.1" step="0.1">
-                <span class="error-message" id="transaction-multiplier-error"></span>
-            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="transaction-amount">单次交易数量</label>
+                    <input type="number" class="form-input" id="transaction-amount" placeholder="例如: 100" value="0" min="0" step="0.01">
+                    <span class="error-message" id="transaction-amount-error"></span>
+                </div>
 
-            <div class="display-area">
-                <p><strong>当前账户:</strong> <span id="current-account-display" class="highlight">N/A</span></p>
-                <p><strong>交易笔数:</strong> <span id="transaction-count" class="highlight">0</span></p>
-                <p><strong>总交易额:</strong> <span id="total-transaction-value" class="highlight">0.00</span></p>
+                <div class="form-group">
+                    <label class="form-label" for="transaction-multiplier-input">交易倍数</label>
+                    <input type="number" class="form-input" id="transaction-multiplier-input" value="1" min="0.1" step="0.1">
+                    <span class="error-message" id="transaction-multiplier-error"></span>
+                </div>
             </div>
         </div>
 
-        <p class="instructions">
-            按 <kbd>上</kbd> 键增加交易笔数，按 <kbd>下</kbd> 键减少交易笔数。
-        </p>
+        <!-- 统计显示区域 -->
+        <div class="stats-section hidden" id="stats-section">
+            <div class="section-title">
+                <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                </svg>
+                交易统计
+            </div>
 
-        <p class="author-credit">
-            作者: <a href="https://x.com/0xM3tr0" target="_blank" rel="noopener noreferrer">X: @0xM3tr0</a>
-        </p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">当前账户</div>
+                    <div class="stat-value" id="current-account-display">N/A</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">交易笔数</div>
+                    <div class="stat-value highlight" id="transaction-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">总交易额</div>
+                    <div class="stat-value highlight" id="total-transaction-value">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷键提示 -->
+        <div class="keyboard-shortcuts">
+            <h3>快捷键操作</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item">
+                    <span>增加交易笔数</span>
+                    <span class="kbd">↑</span>
+                </div>
+                <div class="shortcut-item">
+                    <span>减少交易笔数</span>
+                    <span class="kbd">↓</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作者信息 -->
+        <div class="author-credit">
+            作者: <a href="https://x.com/0xM3tr0" target="_blank" rel="noopener noreferrer">@0xM3tr0</a>
+        </div>
     </div>
 
+    <!-- 删除确认模态框 -->
     <div id="delete-confirm-modal" class="modal">
         <div class="modal-content">
             <h2>确认删除</h2>
             <p>您确定要删除账户 "<span id="account-to-delete-name"></span>" 吗？此操作无法撤销。</p>
             <div class="modal-actions">
-                <button id="cancel-delete-btn">取消</button>
-                <button id="confirm-delete-btn">确认删除</button>
+                <button class="btn btn-secondary" id="cancel-delete-btn">取消</button>
+                <button class="btn btn-danger" id="confirm-delete-btn">确认删除</button>
             </div>
         </div>
     </div>
 
+    <!-- Toast 通知 -->
     <div id="toast-notification" class="toast">已保存</div>
 
     <script>
@@ -447,7 +737,8 @@
         const transactionCountDisplay = document.getElementById('transaction-count');
         const totalTransactionValueDisplay = document.getElementById('total-transaction-value');
         const currentAccountDisplay = document.getElementById('current-account-display');
-        const accountDetailsWrapper = document.getElementById('account-details-section');
+        const accountDetailsSection = document.getElementById('account-details-section');
+        const statsSection = document.getElementById('stats-section');
         const emptyStateContainer = document.getElementById('empty-state-container');
 
         // Error message spans
@@ -460,8 +751,8 @@
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const accountToDeleteNameSpan = document.getElementById('account-to-delete-name');
         const toastNotification = document.getElementById('toast-notification');
+        
         let toastTimeoutId = null;
-
         let accounts = [];
         let currentAccountId = null;
         let nextAccountId = 0;
@@ -471,14 +762,8 @@
         function initializeApp() {
             loadState();
             renderAccountButtons();
-            updateActionButtonsState();
-            if (currentAccountId && accounts.find(acc => acc.id === currentAccountId)) {
-                updateDisplay(false);
-            } else if (accounts.length > 0) {
-                switchAccount(accounts[0].id, false);
-            } else {
-                updateDisplay(false);
-            }
+            updateUI();
+            setupEventListeners();
         }
 
         // Load state from localStorage
@@ -487,10 +772,17 @@
             if (savedState) {
                 try {
                     const parsedState = JSON.parse(savedState);
-                    accounts = parsedState.accounts && Array.isArray(parsedState.accounts) ? parsedState.accounts : getDefaultAccounts();
-                    currentAccountId = parsedState.currentAccountId || (accounts.length > 0 ? accounts[0].id : null);
-                    nextAccountId = parsedState.nextAccountId || accounts.length;
+                    accounts = parsedState.accounts || [];
+                    currentAccountId = parsedState.currentAccountId || null;
+                    nextAccountId = parsedState.nextAccountId || 0;
+                    
+                    // Ensure data integrity
                     accounts.forEach(ensureAccountDataIntegrity);
+                    
+                    // Validate current account
+                    if (currentAccountId && !accounts.find(acc => acc.id === currentAccountId)) {
+                        currentAccountId = accounts.length > 0 ? accounts[0].id : null;
+                    }
                 } catch (e) {
                     console.error("解析localStorage状态时出错:", e);
                     resetToDefaultState();
@@ -504,28 +796,29 @@
         function ensureAccountDataIntegrity(account) {
             if (typeof account.transactionCount === 'undefined') account.transactionCount = 0;
             if (typeof account.transactionAmount === 'undefined') account.transactionAmount = 0;
-            if (typeof account.name === 'undefined') account.name = `账户 ${account.id.split('_')[1] ? parseInt(account.id.split('_')[1]) + 1 : 'New'}`;
+            if (typeof account.name === 'undefined') account.name = `账户 ${account.id.split('_')[1] || 'New'}`;
+            if (typeof account.transactionMultiplier === 'undefined') account.transactionMultiplier = 1;
+            
+            // Handle legacy doubleTransaction field
             if (typeof account.doubleTransaction !== 'undefined') {
                 account.transactionMultiplier = account.doubleTransaction ? 2 : 1;
                 delete account.doubleTransaction;
             }
-            if (typeof account.transactionMultiplier === 'undefined') account.transactionMultiplier = 1;
         }
 
         // Save state to localStorage
         function saveState(showToastFlag = true) {
             localStorage.setItem('transactionCounterState', JSON.stringify({
-                accounts: accounts, currentAccountId: currentAccountId, nextAccountId: nextAccountId
+                accounts: accounts,
+                currentAccountId: currentAccountId,
+                nextAccountId: nextAccountId
             }));
             if (showToastFlag) showToast("已保存");
         }
 
-        // Get default accounts (empty array)
-        function getDefaultAccounts() { return []; }
-
-        // Reset to default state (no accounts)
+        // Reset to default state
         function resetToDefaultState() {
-            accounts = getDefaultAccounts();
+            accounts = [];
             currentAccountId = null;
             nextAccountId = 0;
         }
@@ -533,67 +826,166 @@
         // Render account selection buttons
         function renderAccountButtons() {
             accountButtonsContainer.innerHTML = '';
+            
             accounts.forEach(account => {
                 const button = document.createElement('button');
-                button.id = `btn-${account.id}`;
+                button.className = 'account-btn';
                 button.textContent = account.name;
-                button.classList.add('account-button');
-                if (account.id === currentAccountId) button.classList.add('active');
-                button.addEventListener('click', () => switchAccount(account.id));
+                button.onclick = () => switchAccount(account.id);
+                
+                if (account.id === currentAccountId) {
+                    button.classList.add('active');
+                }
+                
                 accountButtonsContainer.appendChild(button);
             });
         }
 
-        // Update UI display based on current account data
-        function updateDisplay(triggerSaveAndToast = true) {
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
+        // Update UI based on current state
+        function updateUI() {
+            if (accounts.length === 0) {
+                showEmptyState();
+            } else {
+                showAccountInterface();
+                updateAccountDetails();
+                updateStats();
+            }
+            updateActionButtons();
+        }
 
-            if (accounts.length === 0 || !currentAccountData) {
-                emptyStateContainer.classList.add('visible');
-                accountDetailsWrapper.classList.add('hidden');
+        // Show empty state
+        function showEmptyState() {
+            emptyStateContainer.classList.remove('hidden');
+            accountDetailsSection.classList.add('hidden');
+            statsSection.classList.add('hidden');
+        }
+
+        // Show account interface
+        function showAccountInterface() {
+            emptyStateContainer.classList.add('hidden');
+            accountDetailsSection.classList.remove('hidden');
+            statsSection.classList.remove('hidden');
+        }
+
+        // Update account details form
+        function updateAccountDetails() {
+            const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccount) {
+                accountNameInput.value = currentAccount.name;
+                transactionAmountInput.value = currentAccount.transactionAmount;
+                transactionMultiplierInput.value = currentAccount.transactionMultiplier;
+                clearAllInputErrors();
+            }
+        }
+
+        // Update statistics display
+        function updateStats() {
+            const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccount) {
+                currentAccountDisplay.textContent = currentAccount.name;
+                transactionCountDisplay.textContent = currentAccount.transactionCount;
+                
+                const effectiveAmount = currentAccount.transactionAmount * currentAccount.transactionMultiplier;
+                const totalValue = currentAccount.transactionCount * effectiveAmount;
+                totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
+            } else {
                 currentAccountDisplay.textContent = "N/A";
                 transactionCountDisplay.textContent = "0";
                 totalTransactionValueDisplay.textContent = "0.00";
-                accountNameInput.value = "";
-                transactionAmountInput.value = "0";
-                transactionMultiplierInput.value = "1";
-            } else {
-                emptyStateContainer.classList.remove('visible');
-                accountDetailsWrapper.classList.remove('hidden');
-                accountDetailsWrapper.classList.add('fading');
-
-                setTimeout(() => {
-                    const freshAccountData = accounts.find(acc => acc.id === currentAccountId);
-                    if (!freshAccountData) {
-                        if (accounts.length > 0) switchAccount(accounts[0].id, false);
-                        else {
-                            emptyStateContainer.classList.add('visible');
-                            accountDetailsWrapper.classList.add('hidden');
-                        }
-                    } else {
-                        accountNameInput.value = freshAccountData.name;
-                        currentAccountDisplay.textContent = freshAccountData.name;
-                        transactionCountDisplay.textContent = freshAccountData.transactionCount;
-                        let effectiveTransactionAmount = freshAccountData.transactionAmount * freshAccountData.transactionMultiplier;
-                        const totalValue = freshAccountData.transactionCount * effectiveTransactionAmount;
-                        totalTransactionValueDisplay.textContent = totalValue.toFixed(2);
-                        transactionAmountInput.value = freshAccountData.transactionAmount;
-                        transactionMultiplierInput.value = freshAccountData.transactionMultiplier;
-                    }
-                    if (triggerSaveAndToast && freshAccountData) saveState();
-                    else if (freshAccountData) saveState(false);
-
-                    accountDetailsWrapper.classList.remove('fading');
-                }, 150);
             }
-            updateActionButtonsState();
         }
 
-        // Update enabled/disabled state of action buttons
-        function updateActionButtonsState() {
-            const hasActiveAccount = accounts.length > 0 && currentAccountId && accounts.find(acc => acc.id === currentAccountId);
-            deleteAccountBtn.disabled = !hasActiveAccount;
-            resetCountBtn.disabled = !hasActiveAccount;
+        // Update action buttons state
+        function updateActionButtons() {
+            const hasAccount = accounts.length > 0 && currentAccountId;
+            deleteAccountBtn.disabled = !hasAccount;
+            resetCountBtn.disabled = !hasAccount;
+        }
+
+        // Switch to a different account
+        function switchAccount(accountId) {
+            currentAccountId = accountId;
+            renderAccountButtons();
+            updateAccountDetails();
+            updateStats();
+            updateActionButtons();
+            saveState(false);
+        }
+
+        // Add a new account
+        function addAccount() {
+            const newAccountId = `account_${nextAccountId++}`;
+            const newAccount = {
+                id: newAccountId,
+                name: `新账户 ${nextAccountId}`,
+                transactionCount: 0,
+                transactionAmount: 0,
+                transactionMultiplier: 1
+            };
+            
+            accounts.push(newAccount);
+            currentAccountId = newAccountId;
+            
+            renderAccountButtons();
+            updateUI();
+            
+            // Focus on name input for immediate editing
+            setTimeout(() => {
+                accountNameInput.focus();
+                accountNameInput.select();
+            }, 100);
+            
+            saveState(false);
+        }
+
+        // Delete current account
+        function deleteCurrentAccount() {
+            if (!currentAccountId) return;
+            
+            const account = accounts.find(acc => acc.id === currentAccountId);
+            if (account) {
+                accountIdToDelete = currentAccountId;
+                accountToDeleteNameSpan.textContent = account.name;
+                deleteConfirmModal.style.display = 'flex';
+            }
+        }
+
+        // Confirm account deletion
+        function confirmAccountDeletion() {
+            if (!accountIdToDelete) return;
+            
+            const accountIndex = accounts.findIndex(acc => acc.id === accountIdToDelete);
+            if (accountIndex > -1) {
+                accounts.splice(accountIndex, 1);
+                
+                // Set new current account
+                if (currentAccountId === accountIdToDelete) {
+                    currentAccountId = accounts.length > 0 ? accounts[Math.max(0, accountIndex - 1)].id : null;
+                }
+            }
+            
+            closeDeleteModal();
+            renderAccountButtons();
+            updateUI();
+            saveState(false);
+            showToast("账户已删除");
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            deleteConfirmModal.style.display = 'none';
+            accountIdToDelete = null;
+        }
+
+        // Reset transaction count
+        function resetTransactionCount() {
+            const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+            if (currentAccount) {
+                currentAccount.transactionCount = 0;
+                updateStats();
+                saveState();
+                showToast("计数已重置");
+            }
         }
 
         // Show toast notification
@@ -607,219 +999,114 @@
             }, 2000);
         }
 
-        // Switch to a different account
-        function switchAccount(accountId, triggerSaveAndToast = true) {
-            if (currentAccountId === accountId && !triggerSaveAndToast && accounts.find(acc => acc.id === currentAccountId)) return;
-            currentAccountId = accountId;
-            document.querySelectorAll('.account-selector button').forEach(btn => btn.classList.remove('active'));
-            const newActiveButton = document.getElementById(`btn-${accountId}`);
-            if (newActiveButton) newActiveButton.classList.add('active');
-            updateDisplay(triggerSaveAndToast);
-            clearAllInputErrors();
-        }
-
-        // Add a new account
-        function addAccount() {
-            emptyStateContainer.classList.remove('visible');
-            accountDetailsWrapper.classList.remove('hidden');
-
-            const newAccountId = `account_${nextAccountId++}`;
-            const newAccount = {
-                id: newAccountId, name: `新账户 ${nextAccountId}`, transactionCount: 0,
-                transactionAmount: 0, transactionMultiplier: 1
-            };
-            accounts.push(newAccount);
-            renderAccountButtons();
-            switchAccount(newAccountId, false);
-            accountNameInput.focus();
-            accountNameInput.select();
-            saveState(false);
-        }
-
-        // Handle request to delete the current account
-        function handleDeleteAccountRequest() {
-            if (!currentAccountId) return;
-            const account = accounts.find(acc => acc.id === currentAccountId);
-            if (account) {
-                accountIdToDelete = currentAccountId;
-                accountToDeleteNameSpan.textContent = account.name;
-                deleteConfirmModal.style.display = 'flex';
-            }
-        }
-
-        // Confirm and proceed with account deletion
-        function confirmAccountDeletion() {
-            if (!accountIdToDelete) return;
-            const accountIndex = accounts.findIndex(acc => acc.id === accountIdToDelete);
-            if (accountIndex > -1) {
-                accounts.splice(accountIndex, 1);
-                if (currentAccountId === accountIdToDelete) {
-                    currentAccountId = accounts.length > 0 ? accounts[Math.max(0, accountIndex - 1)].id : null;
-                }
-            }
-            renderAccountButtons();
-            if (currentAccountId) {
-                const newActiveButton = document.getElementById(`btn-${currentAccountId}`);
-                if (newActiveButton) newActiveButton.classList.add('active');
-                updateDisplay(false);
-            } else {
-                updateDisplay(false);
-            }
-            closeDeleteModal();
-            accountIdToDelete = null;
-            saveState(false);
-            showToast("账户已删除");
-        }
-
-        // Close the delete confirmation modal
-        function closeDeleteModal() {
-            deleteConfirmModal.style.display = 'none';
-            accountIdToDelete = null;
-        }
-
-        // Reset transaction count for the current account
-        function resetCurrentAccountCount() {
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (currentAccountData) {
-                currentAccountData.transactionCount = 0;
-                updateDisplay();
-                showToast("计数已归零");
-            }
-        }
-
-        // Input Validation and Error Display
+        // Input validation and error handling
         function displayInputError(inputElement, errorElement, message) {
-            inputElement.classList.add('input-error');
+            inputElement.classList.add('error');
             errorElement.textContent = message;
         }
 
         function clearInputError(inputElement, errorElement) {
-            inputElement.classList.remove('input-error');
+            inputElement.classList.remove('error');
             errorElement.textContent = '';
         }
+
         function clearAllInputErrors() {
             clearInputError(accountNameInput, accountNameError);
             clearInputError(transactionAmountInput, transactionAmountError);
             clearInputError(transactionMultiplierInput, transactionMultiplierError);
         }
 
-        // Event Listeners
-        accountNameInput.addEventListener('input', (event) => {
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (currentAccountData) {
-                currentAccountData.name = event.target.value.trim() === '' ? `账户 ${currentAccountData.id.split('_')[1] ? parseInt(currentAccountData.id.split('_')[1]) + 1 : 'Unnamed'}` : event.target.value;
-                const currentButton = document.getElementById(`btn-${currentAccountId}`);
-                if (currentButton) currentButton.textContent = currentAccountData.name;
-                currentAccountDisplay.textContent = currentAccountData.name;
-                saveState();
-            }
-        });
-        accountNameInput.addEventListener('blur', (event) => {
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-             if (currentAccountData && event.target.value.trim() === '') {
-                event.target.value = `账户 ${currentAccountData.id.split('_')[1] ? parseInt(currentAccountData.id.split('_')[1]) + 1 : 'Unnamed'}`;
-                currentAccountData.name = event.target.value;
-                const currentButton = document.getElementById(`btn-${currentAccountId}`);
-                if (currentButton) currentButton.textContent = currentAccountData.name;
-                currentAccountDisplay.textContent = currentAccountData.name;
-                saveState();
-            }
-        });
-
-
-        transactionAmountInput.addEventListener('input', (event) => {
-            clearInputError(transactionAmountInput, transactionAmountError);
-            const rawValue = event.target.value;
-            let amount = parseFloat(rawValue);
-
-            if (rawValue.trim() === '' || isNaN(amount) || amount < 0) {
-                if (rawValue.trim() !== '') {
-                    displayInputError(transactionAmountInput, transactionAmountError, "请输入有效的非负数字。");
+        // Setup event listeners
+        function setupEventListeners() {
+            // Account name input
+            accountNameInput.addEventListener('input', (event) => {
+                const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+                if (currentAccount) {
+                    const newName = event.target.value.trim() || `账户 ${currentAccount.id.split('_')[1] || 'Unnamed'}`;
+                    currentAccount.name = newName;
+                    renderAccountButtons();
+                    updateStats();
+                    saveState();
                 }
-            }
+            });
 
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (currentAccountData) {
-                currentAccountData.transactionAmount = isNaN(parseFloat(event.target.value)) || parseFloat(event.target.value) < 0 ? 0 : parseFloat(event.target.value);
-                updateDisplay();
-            }
-        });
-        transactionAmountInput.addEventListener('blur', (event) => {
-            let amount = parseFloat(event.target.value);
-            if (isNaN(amount) || amount < 0) {
-                event.target.value = 0;
+            // Transaction amount input
+            transactionAmountInput.addEventListener('input', (event) => {
                 clearInputError(transactionAmountInput, transactionAmountError);
-                const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-                if (currentAccountData) {
-                    currentAccountData.transactionAmount = 0;
-                    updateDisplay();
+                const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+                if (currentAccount) {
+                    const value = parseFloat(event.target.value) || 0;
+                    if (value >= 0) {
+                        currentAccount.transactionAmount = value;
+                        updateStats();
+                        saveState();
+                    } else {
+                        displayInputError(transactionAmountInput, transactionAmountError, "请输入有效的非负数");
+                    }
                 }
-            }
-        });
+            });
 
-        transactionMultiplierInput.addEventListener('input', (event) => {
-            clearInputError(transactionMultiplierInput, transactionMultiplierError);
-            const rawValue = event.target.value;
-            let multiplier = parseFloat(rawValue);
-
-            if (rawValue.trim() === '' || isNaN(multiplier) || multiplier <= 0) {
-                 if (rawValue.trim() !== '') {
-                    displayInputError(transactionMultiplierInput, transactionMultiplierError, "请输入有效的正数。");
-                }
-            }
-
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (currentAccountData) {
-                currentAccountData.transactionMultiplier = isNaN(parseFloat(event.target.value)) || parseFloat(event.target.value) <=0 ? 1 : parseFloat(event.target.value);
-                updateDisplay();
-            }
-        });
-         transactionMultiplierInput.addEventListener('blur', (event) => {
-            let multiplier = parseFloat(event.target.value);
-            if (isNaN(multiplier) || multiplier <= 0) {
-                event.target.value = 1;
+            // Transaction multiplier input
+            transactionMultiplierInput.addEventListener('input', (event) => {
                 clearInputError(transactionMultiplierInput, transactionMultiplierError);
-                const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-                if (currentAccountData) {
-                    currentAccountData.transactionMultiplier = 1;
-                    updateDisplay();
+                const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+                if (currentAccount) {
+                    const value = parseFloat(event.target.value) || 1;
+                    if (value > 0) {
+                        currentAccount.transactionMultiplier = value;
+                        updateStats();
+                        saveState();
+                    } else {
+                        displayInputError(transactionMultiplierInput, transactionMultiplierError, "请输入大于0的数值");
+                    }
                 }
-            }
-        });
+            });
 
-        addAccountBtn.addEventListener('click', addAccount);
-        deleteAccountBtn.addEventListener('click', handleDeleteAccountRequest);
-        resetCountBtn.addEventListener('click', resetCurrentAccountCount);
-        confirmDeleteBtn.addEventListener('click', confirmAccountDeletion);
-        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            // Action buttons
+            addAccountBtn.addEventListener('click', addAccount);
+            deleteAccountBtn.addEventListener('click', deleteCurrentAccount);
+            resetCountBtn.addEventListener('click', resetTransactionCount);
 
-        window.addEventListener('click', (event) => {
-            if (event.target === deleteConfirmModal) closeDeleteModal();
-        });
+            // Modal buttons
+            confirmDeleteBtn.addEventListener('click', confirmAccountDeletion);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
 
-        document.addEventListener('keydown', (event) => {
-            if (deleteConfirmModal.style.display === 'flex') {
-                if (event.key === 'Escape') closeDeleteModal();
-                return;
-            }
-            if ([accountNameInput, transactionAmountInput, transactionMultiplierInput].includes(document.activeElement)) {
-                return;
-            }
-            const currentAccountData = accounts.find(acc => acc.id === currentAccountId);
-            if (!currentAccountData) return;
-
-            if (event.key === 'ArrowUp') {
-                currentAccountData.transactionCount++;
-                updateDisplay();
-                event.preventDefault();
-            } else if (event.key === 'ArrowDown') {
-                if (currentAccountData.transactionCount > 0) {
-                    currentAccountData.transactionCount--;
-                    updateDisplay();
+            // Modal close on outside click
+            deleteConfirmModal.addEventListener('click', (event) => {
+                if (event.target === deleteConfirmModal) {
+                    closeDeleteModal();
                 }
-                event.preventDefault();
-            }
-        });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (event) => {
+                // Don't trigger shortcuts when modal is open or inputs are focused
+                if (deleteConfirmModal.style.display === 'flex' || 
+                    [accountNameInput, transactionAmountInput, transactionMultiplierInput].includes(document.activeElement)) {
+                    if (event.key === 'Escape' && deleteConfirmModal.style.display === 'flex') {
+                        closeDeleteModal();
+                    }
+                    return;
+                }
+
+                const currentAccount = accounts.find(acc => acc.id === currentAccountId);
+                if (!currentAccount) return;
+
+                if (event.key === 'ArrowUp') {
+                    currentAccount.transactionCount++;
+                    updateStats();
+                    saveState();
+                    event.preventDefault();
+                } else if (event.key === 'ArrowDown') {
+                    if (currentAccount.transactionCount > 0) {
+                        currentAccount.transactionCount--;
+                        updateStats();
+                        saveState();
+                    }
+                    event.preventDefault();
+                }
+            });
+        }
 
         // Start the application
         initializeApp();
